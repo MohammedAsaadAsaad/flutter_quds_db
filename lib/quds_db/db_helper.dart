@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:sqflite_common/sqlite_api.dart' as sqlite_api;
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+
 import '../quds_db.dart';
 
 class DbHelper {
@@ -14,7 +15,7 @@ class DbHelper {
       String,
     ],
     'INTEGER': [
-      // Color,
+      Color,
       DateTime,
       int,
       Int32,
@@ -50,7 +51,7 @@ class DbHelper {
           ? null
           : DateTime.fromMillisecondsSinceEpoch(dbValue);
 
-    // if  (type == Color) return dbValue == null ? null : Color(dbValue);
+    if (type == Color) return dbValue == null ? null : Color(dbValue);
 
     return dbValue;
   }
@@ -67,7 +68,7 @@ class DbHelper {
     if (type == DateTime)
       return value == null ? null : value.millisecondsSinceEpoch;
 
-    // if (type == Color) return value == null ? null : (value as Color).value;
+    if (type == Color) return value == null ? null : (value as Color).value;
 
     return value;
   }

@@ -1,3 +1,5 @@
+import 'package:flutter/painting.dart';
+
 import '../../quds_db.dart';
 
 class FieldWithValue<T> extends QueryPart<T> {
@@ -122,7 +124,7 @@ class FieldWithValue<T> extends QueryPart<T> {
           ? null
           : DateTime.fromMillisecondsSinceEpoch(dbValue);
 
-    // if (type == Color) return dbValue == null ? null : Color(dbValue);
+    if (type == Color) return dbValue == null ? null : Color(dbValue);
 
     return dbValue;
   }
@@ -139,7 +141,7 @@ class FieldWithValue<T> extends QueryPart<T> {
     if (type == DateTime)
       return value == null ? null : value.millisecondsSinceEpoch;
 
-    // if (type == Color) return value == null ? null : (value as Color).value;
+    if (type == Color) return value == null ? null : (value as Color).value;
 
     return value;
   }
