@@ -1,0 +1,20 @@
+name: quds_db
+description: A sqflite expansion package that simplifies creating databases and tables, crud operations, queries with modelization
+version: 0.0.1
+author:
+homepage:
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite_common_ffi: ^2.0.0  
+  sqflite: ^2.0.0+3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+ 
