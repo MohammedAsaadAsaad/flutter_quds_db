@@ -1,6 +1,11 @@
-import 'query_part.dart';
+part of '../../quds_db.dart';
 
-class OrderField extends QueryPart {
+/// Represents sql order part.
+///
+/// for example: `ASC` `DESC` `RANDOM()`
+class FieldOrder extends QueryPart {
+  /// Create an instance of [FieldOrder]
+  FieldOrder() : super._();
   @override
   String buildQuery() {
     if (queryBuilder != null) return queryBuilder!();

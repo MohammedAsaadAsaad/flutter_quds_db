@@ -1,8 +1,14 @@
-import '../../quds_db.dart';
+part of '../../quds_db.dart';
 
+/// A db int field representation.
 class IntField extends NumField<int> {
+  /// Weather the field has auto-increment constrain.
   bool? autoIncrement;
+
+  /// Weather the field has primary-key constrain.
   bool? primaryKey;
+
+  /// Create an instance of [IntField]
   IntField(
       {String? columnName,
       this.autoIncrement,
@@ -27,10 +33,39 @@ class IntField extends NumField<int> {
     return result;
   }
 
+  /// Get new [IntField] of this value - [other]
+  ///
+  /// [other] may be of the following:
+  ///
+  ///  [IntField] - [int]
   IntField operator -(dynamic other) => _getMathOperationQuery('-', other);
+
+  /// Get new [IntField] of this value + [other]
+  ///
+  /// [other] may be of the following:
+  ///
+  ///  [IntField] - [int]
   IntField operator +(dynamic other) => _getMathOperationQuery('+', other);
+
+  /// Get new [IntField] of this value / [other]
+  ///
+  /// [other] may be of the following:
+  ///
+  ///  [IntField] - [int]
   IntField operator /(dynamic other) => _getMathOperationQuery('/', other);
+
+  /// Get new [IntField] of this value % [other]
+  ///
+  /// [other] may be of the following:
+  ///
+  ///  [IntField] - [int]
   IntField operator %(dynamic other) => _getMathOperationQuery('%', other);
+
+  /// Get new [IntField] of this value * [other]
+  ///
+  /// [other] may be of the following:
+  ///
+  ///  [IntField] - [int]
   IntField operator *(dynamic other) => _getMathOperationQuery('*', other);
 
   IntField _getMathOperationQuery(String operation, dynamic other) {
@@ -51,9 +86,13 @@ class IntField extends NumField<int> {
     return result;
   }
 
+  /// Get sql statement to check weather this field is even.
   ConditionQuery get isEven => (this % 2).equals(0);
+
+  /// Get sql statement to check weather this field is odd.
   ConditionQuery get isOdd => (this % 2).equals(1);
 
+  /// Get new [IntField] object with db `ABS()` function applied.
   IntField abs() {
     var result = IntField();
     result.queryBuilder = () => 'ABS(' + this.buildQuery() + ')';
@@ -61,6 +100,7 @@ class IntField extends NumField<int> {
     return result;
   }
 
+  /// Get new [IntField] object with db `AVG()` function applied.
   IntField avg() {
     var result = IntField();
     result.queryBuilder = () => 'AVG(' + this.buildQuery() + ')';
@@ -68,6 +108,7 @@ class IntField extends NumField<int> {
     return result;
   }
 
+  /// Get new [DoubleField] object with this field value.
   DoubleField toDouble() {
     var result = DoubleField();
     result.queryBuilder = () => 'CAST(' + this.buildQuery() + ' AS REAL)';
@@ -75,6 +116,7 @@ class IntField extends NumField<int> {
     return result;
   }
 
+  /// Get random db integer.
   static IntField get randomInteger {
     var result = IntField();
     result.queryBuilder = () => 'RANDOM()';

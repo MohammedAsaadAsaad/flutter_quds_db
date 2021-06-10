@@ -1,32 +1,59 @@
-import '../quds_db.dart';
+part of '../quds_db.dart';
 
+/// Represents a class can be saved in the database.
+///
+/// Every [DbModel] has by default some fields.
+///
+/// `id` - `serverId` - `creationTime` - `modificationTime`
 abstract class DbModel {
+  /// The Id column of this model.
   var id = IdField();
+
+  /// The server id column of this model.
+  ///
+  /// Used if this model has a co-cloud row in some server.
   var serverId = IntField(columnName: 'serverId', jsonMapName: 'id');
+
+  /// The creation time of this model, its value set once automatically when created in db.
   var creationTime = DateTimeField(
     columnName: 'creationTime',
   );
+
+  /// The modification time of this model, its value set automatically when created or modified in db.
   var modificationTime = DateTimeField(
     columnName: 'modificationTime',
   );
 
+  /// Create an instance of [DbModel].
   DbModel();
 
+  /// Called automatically before this model deletion from db.
+  /// For example if a student has multiple exam marks, all marks should be deleted before delete this model.
   beforeDelete() async {}
+
+  /// Called automatically after this model be deleted from db.
   afterDelete() async {}
+
+  /// Called automatically before this model saving in db.
   beforeSave(bool isNew) async {}
+
+  /// Called automatically after this model be saved in db.
   afterSave(bool isNew) async {}
 
+  /// Get a list of the new defined fields of this model without pre-created fields.
   List<FieldWithValue>? getFields();
 
+  /// Get a list of all fields of this model with pre-created fields.
   List<FieldWithValue?> getAllFields() {
     var list = getFields();
     return [id, serverId, creationTime, modificationTime]..addAll(list ?? []);
   }
 
-  ///[other] The other model want to copy values from
+  /// Copy values from [other] db model fields to this fields.
   ///
-  ///[fullCopy] Copy values with (id, serverId, creationTime, modificationTime)
+  /// [other] The other model want to copy values from.
+  ///
+  /// [fullCopy] Copy values with (id, serverId, creationTime, modificationTime).
   void copyValuesFrom(DbModel other,
       {List<FieldWithValue>? fieldsToCopy, bool fullCopy = false}) {
     assert(this.runtimeType == other.runtimeType);
@@ -69,9 +96,11 @@ abstract class DbModel {
     }
   }
 
-  ///[other] The other model want to copy values from
+  /// Get the fields that has different values.
   ///
-  ///[allFields] Check (id, serverId, creationTime, modificationTime) values
+  /// [other] The other model want to copy values from.
+  ///
+  /// [allFields] Check (id, serverId, creationTime, modificationTime) values.
   Iterable<FieldWithValue> differIn(DbModel other,
       {List<FieldWithValue>? fieldsToCheck, bool? allFields = true}) sync* {
     assert(allFields != null);
@@ -105,9 +134,11 @@ abstract class DbModel {
     }
   }
 
-  ///[other] The other model want to copy values from
+  /// Check weather there are different in some fields values.
   ///
-  ///[allFields] Check (id, serverId, creationTime, modificationTime) values
+  /// [other] The other model want to copy values from
+  ///
+  /// [allFields] Check (id, serverId, creationTime, modificationTime) values
   bool differ(DbModel other,
       {List<FieldWithValue>? fieldsToCheck, bool allFields = true}) {
     return differIn(other, fieldsToCheck: fieldsToCheck, allFields: allFields)
@@ -115,17 +146,19 @@ abstract class DbModel {
         0;
   }
 
+  /// Get this model fields with thier names.
   List<FieldWithValue?> _getNamedFields(List<String?> fields) => getAllFields()
       .where((element) => fields.contains(element?.columnName))
       .toList();
 
+  /// Set values of this model from json map.
   void fromMap(Map<String, dynamic> m) {
     var fields = getAllFields();
     for (var f in fields)
       if (f?.jsonMapName != null) {
         if (m.containsKey(f?.jsonMapName)) {
           try {
-            var v = DbHelper.getMapValue(m[f?.jsonMapName], f!.valueType);
+            var v = DbHelper._getMapValue(m[f?.jsonMapName], f!.valueType);
             f.value = v;
           } catch (e) {
             print(e);

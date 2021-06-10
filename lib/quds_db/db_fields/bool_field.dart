@@ -1,6 +1,8 @@
-import '../../quds_db.dart';
+part of '../../quds_db.dart';
 
+/// A bool db field representation.
 class BoolField extends FieldWithValue<bool> {
+  /// Create an instance of [BoolField]
   BoolField(
       {String? columnName,
       bool? notNull,
@@ -14,8 +16,15 @@ class BoolField extends FieldWithValue<bool> {
             jsonMapName: jsonMapName,
             jsonMapType: bool);
 
+  /// Get [ConditionQuery] object to detect if this value is [true] in the db.
   ConditionQuery get isTrue => equals(true);
+
+  /// Get [ConditionQuery] object to detect if this value is [false] in the db.
   ConditionQuery get isFalse => equals(false);
+
+  /// Get [ConditionQuery] object to detect if this value is not [false] in the db.
   ConditionQuery get isNotFalse => notEquals(false);
+
+  /// Get [ConditionQuery] object to detect if this value is not [true] in the db.
   ConditionQuery get isNotTrue => notEquals(true);
 }

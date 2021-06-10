@@ -1,18 +1,16 @@
-import 'dart:io';
+part of '../quds_db.dart';
 
-import 'package:flutter/cupertino.dart';
-import 'package:sqflite_common/sqlite_api.dart' as sqlite_api;
-import 'package:sqflite/sqflite.dart' as sqflite;
-
-import '../quds_db.dart';
-
+/// Represents a table in db with CRUD and other helping functions.
 abstract class DbTableProvider<T extends DbModel> {
-  String? specialDbFile;
+  String? _specialDbFile;
 
+  /// Get the name of this table.
   String get tableName;
+
+  /// Get the id column name in this table.
   String get idColumnName => 'id';
 
-  String get createStatement {
+  String get _createStatement {
     T tempEntry = _createInstance();
 
     String cS = 'CREATE TABLE IF NOT EXISTS ' + tableName;
@@ -27,26 +25,43 @@ abstract class DbTableProvider<T extends DbModel> {
     return cS;
   }
 
-  sqlite_api.Database? databaseWindows;
-  sqflite.Database? databaseCross;
-  bool databaseInitialized = false;
+  sqlite_api.Database? _databaseWindows;
+  sqflite.Database? _databaseCross;
+  dynamic _databaseWeb;
+  bool _databaseInitialized = false;
 
-  Future initializeDB() async {
-    if (databaseInitialized)
-      return Platform.isWindows ? databaseWindows : databaseCross;
+  /// Initialize the database, check this table, create an modify as required.
+  Future _initializeDB() async {
+    if (_databaseInitialized)
+      return kIsWeb
+          ? _databaseWeb
+          : Platform.isWindows
+              ? _databaseWindows
+              : _databaseCross;
 
-    Platform.isWindows
-        ? databaseWindows = await DbHelper.checkDbAndTable(this)
-        : databaseCross = await DbHelper.checkDbAndTable(this);
+    kIsWeb
+        ? _databaseWeb = await DbHelper._checkDbAndTable(this)
+        : Platform.isWindows
+            ? _databaseWindows = await DbHelper._checkDbAndTable(this)
+            : _databaseCross = await DbHelper._checkDbAndTable(this);
 
-    databaseInitialized = true;
-    return Platform.isWindows ? databaseWindows : databaseCross;
+    _databaseInitialized = true;
+    return kIsWeb
+        ? _databaseWeb
+        : Platform.isWindows
+            ? _databaseWindows
+            : _databaseCross;
   }
 
+  /// Close this table database. Cannot be accessed anymore
   Future<bool> closeDB() async {
     try {
-      if (databaseInitialized /*&& database.isOpen*/)
-        Platform.isWindows ? databaseWindows?.close() : databaseCross?.close();
+      if (_databaseInitialized /*&& database.isOpen*/)
+        kIsWeb
+            ? _databaseWeb?.close()
+            : Platform.isWindows
+                ? _databaseWindows?.close()
+                : _databaseCross?.close();
 
       return true;
     } catch (e) {
@@ -54,22 +69,37 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
-  Future<bool> checkAndCreateTableIfNotExist(dynamic db) async {
+  Future<bool> _checkAndCreateTableIfNotExist(dynamic db) async {
     try {
-      db.execute(createStatement);
+      // if (kIsWeb) {
+      //   _webSqlExecuteQuery(db, _createStatement);
+      // } else
+      db.execute(_createStatement);
       return true;
     } catch (e) {
+      if (kDebugMode) print('SqlException: $e');
+
       return false;
     }
   }
 
-  Future vaccumDb() async {
-    var db = await initializeDB();
+  /// Vacuum this table database.
+  Future vacuumDb() async {
+    var db = await _initializeDB();
+    // if (kIsWeb)
+    //   _webSqlExecuteQuery(db, 'vacuum;');
+    // else
     await db.rawQuery('vacuum;');
   }
 
-  Future<bool> checkEachColumn(dynamic db) async {
-    var tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
+  Future<bool> _checkEachColumn(dynamic db) async {
+    var tableInfo;
+
+    // if (kIsWeb) {
+    //   tableInfo =
+    //       await _webSqlExecuteQuery(db, 'PRAGMA table_info($tableName)');
+    // } else
+    tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
 
     var foundColumns = new Map<String, String>();
     tableInfo.forEach((m) {
@@ -90,12 +120,13 @@ abstract class DbTableProvider<T extends DbModel> {
   }
 
 //CRUD Methods
+  /// Insert new entry to this table.
   Future<bool> insertEntry(T entry) async {
     try {
       await entry.beforeSave(true);
 
       int result = 0;
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var map = new Map<String, dynamic>();
       entry.creationTime.value = DateTime.now();
       entry.modificationTime.value = DateTime.now();
@@ -110,12 +141,13 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
-  Future<void> insertCollection(List<T> items) async {
-    if (items.length == 0) return;
+  /// Insert a collection of [entries] to this table.
+  Future<void> insertCollection(List<T> entries) async {
+    if (entries.length == 0) return;
     try {
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var batch = db.batch();
-      for (var entry in items) {
+      for (var entry in entries) {
         await entry.beforeSave(true);
         var map = new Map<String, dynamic>();
         entry.creationTime.value = DateTime.now();
@@ -125,20 +157,23 @@ abstract class DbTableProvider<T extends DbModel> {
         await entry.afterSave(true);
       }
       var result = await batch.commit();
-      for (int i = 0; i < items.length; i++) {
-        items[i].id.value = result[i];
-        _fireChangeListners(EntryChangeType.Insertion, items[i]);
+      for (int i = 0; i < entries.length; i++) {
+        entries[i].id.value = result[i];
+        _fireChangeListners(EntryChangeType.Insertion, entries[i]);
       }
     } catch (e) {
       return;
     }
   }
 
-  Future<void> updateCollectionById(List<T> items) async {
+  /// Update a collection of [entries] in this table.
+  ///
+  /// The considerable identity here is [DbModel.id]
+  Future<void> updateCollectionById(List<T> entries) async {
     try {
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var batch = db.batch();
-      for (var entry in items) {
+      for (var entry in entries) {
         await entry.beforeSave(true);
         var map = new Map<String, dynamic>();
         entry.creationTime.value = DateTime.now();
@@ -149,20 +184,23 @@ abstract class DbTableProvider<T extends DbModel> {
         await entry.afterSave(true);
       }
       await batch.commit();
-      for (int i = 0; i < items.length; i++) {
+      for (int i = 0; i < entries.length; i++) {
         // items[i].id = result[i];
-        _fireChangeListners(EntryChangeType.Modification, items[i]);
+        _fireChangeListners(EntryChangeType.Modification, entries[i]);
       }
     } catch (e) {
       return;
     }
   }
 
-  Future<void> updateCollectionByServerId(List<T> items) async {
+  /// Update a collection of [entries] in this table.
+  ///
+  /// The considerable identity here is [DbModel.serverId]
+  Future<void> updateCollectionByServerId(List<T> entries) async {
     try {
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var batch = db.batch();
-      for (var entry in items) {
+      for (var entry in entries) {
         await entry.beforeSave(true);
         var map = new Map<String, dynamic>();
         entry.creationTime.value = DateTime.now();
@@ -173,21 +211,25 @@ abstract class DbTableProvider<T extends DbModel> {
         await entry.afterSave(true);
       }
       await batch.commit();
-      for (int i = 0; i < items.length; i++) {
+      for (int i = 0; i < entries.length; i++) {
         // items[i].id = result[i];
-        _fireChangeListners(EntryChangeType.Modification, items[i]);
+        _fireChangeListners(EntryChangeType.Modification, entries[i]);
       }
     } catch (e) {
       return;
     }
   }
 
-  Future<void> insertOrUpdateCollectionByServerId(List<T> items,
+  /// Insert or update a collection of [entries], with considering [DbModel.serverId] as
+  /// the key.
+  ///
+  /// Insert [entries] with not inserted serverId before and update the inserted before.
+  Future<void> insertOrUpdateCollectionByServerId(List<T> entries,
       {List<FieldWithValue>? fieldsToCopy}) async {
     try {
       //get serverIds
       List<int> itemServerIds = [
-        for (var i in items)
+        for (var i in entries)
           if (i.serverId.value != null) i.serverId.value!
       ];
 
@@ -201,14 +243,14 @@ abstract class DbTableProvider<T extends DbModel> {
       //Get items need to be updated
       for (var item in insertedItems) {
         var newItem =
-            items.firstWhere((i) => i.serverId.value == item.serverId.value);
+            entries.firstWhere((i) => i.serverId.value == item.serverId.value);
         item.copyValuesFrom(newItem, fieldsToCopy: fieldsToCopy);
       }
 
       await updateCollectionByServerId(insertedItems);
 
       //Get items need to be insered
-      var newItems = items
+      var newItems = entries
           .where((e) => !insertedServerIds.contains(e.serverId.value))
           .toList();
 
@@ -219,12 +261,13 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
-  Future<bool> insertCollectionInTransaction(List<T> items) async {
-    if (items.length == 0) return true;
+  /// Insert a collection of [entries] using a transaction.
+  Future<bool> insertCollectionInTransaction(List<T> entries) async {
+    if (entries.length == 0) return true;
     try {
-      var db = await initializeDB() as sqflite.Database;
+      var db = await _initializeDB() as sqflite.Database;
       await db.transaction((sqflite.Transaction tx) async {
-        for (var entry in items) {
+        for (var entry in entries) {
           await entry.beforeSave(true);
           var map = new Map<String, dynamic>();
           entry.creationTime.value = DateTime.now();
@@ -242,12 +285,13 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
+  /// Update an entry in this table.
   Future<bool> updateEntry(T entry) async {
     if (entry.id.value == null) return await insertEntry(entry);
 
     try {
       await entry.beforeSave(false);
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var map = new Map<String, dynamic>();
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
@@ -260,10 +304,11 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
+  /// Update an entry by its serverId as key.
   Future<bool> updateEntryByServerId(T entry) async {
     try {
       await entry.beforeSave(false);
-      var db = await initializeDB();
+      var db = await _initializeDB();
       var map = new Map<String, dynamic>();
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
@@ -284,12 +329,16 @@ abstract class DbTableProvider<T extends DbModel> {
     for (var f in fields) map[f!.columnName] = f.dbValue;
   }
 
-  final T Function() factoryOfT;
-  DbTableProvider(this.factoryOfT, {this.specialDbFile});
+  final T Function() _factoryOfT;
+
+  /// Create an instance of DbTableProvider
+  DbTableProvider(this._factoryOfT, {String? specialDbFile}) {
+    this._specialDbFile = specialDbFile;
+  }
   T _createInstance() {
-    T result = factoryOfT();
+    T result = _factoryOfT();
     result.getAllFields().forEach((e) {
-      e!.tableName = this.tableName;
+      e!._tableName = this.tableName;
     });
     return result;
   }
@@ -307,12 +356,14 @@ abstract class DbTableProvider<T extends DbModel> {
     return e;
   }
 
+  /// Generate an entry using json map.
   T entryFromMap(Map<String, dynamic> r) => _entryFromMap(r);
 
+  /// Make query with pagination.
   Future<DataPageQueryResult<T>> loadAllEntriesByPaging(
       {required DataPageQuery<T> pageQuery,
       ConditionQuery Function(T model)? where,
-      List<OrderField> Function(T model)? orderBy,
+      List<FieldOrder> Function(T model)? orderBy,
       List<FieldWithValue> Function(T model)? desiredFields}) async {
     int count = await countEntries(where: where);
     return DataPageQueryResult<T>(
@@ -327,28 +378,32 @@ abstract class DbTableProvider<T extends DbModel> {
         pageQuery.resultsPerPage);
   }
 
+  /// Get an entry by its id as key.
   Future<T?> loadEntryById(int id) async {
     var result = (await select(where: (m) => m.id.equals(id), limit: 1));
     return result.length > 0 ? result.first : null;
   }
 
+  /// Get an entry by its server id as key.
   Future<T?> loadEntryByServerId(int serverId) async {
     var result =
         (await select(where: (m) => m.serverId.equals(serverId), limit: 1));
     return result.length > 0 ? result.first : null;
   }
 
+  /// Count the entries of this table with [where] if required.
   Future<int> countEntries({
     ConditionQuery Function(T model)? where,
   }) async {
     return await queryFirstValue((s) => s.id.count(), where: where);
   }
 
+  /// Delete an entry from this table.
   Future<int> deleteEntry(T entry) async {
     await entry.beforeDelete();
 
     int result = 0;
-    var db = await initializeDB();
+    var db = await _initializeDB();
     result =
         await db.delete(tableName, where: "$idColumnName=${entry.id.value}");
 
@@ -357,14 +412,17 @@ abstract class DbTableProvider<T extends DbModel> {
     return result;
   }
 
+  /// Remove all entries in this table permenantly.
   Future deleteAllEntries() async {
     await delete();
   }
 
+  /// Get a collection of entries from this table using thier ids.
   Future<List<T>> getEntriesByIds(List<int> ids) async {
     return await select(where: (r) => r.id.inCollection(ids));
   }
 
+  /// Get a random entry from this table.
   Future<T?> getRandomEntry({ConditionQuery Function(T model)? where}) async {
     return selectFirst(where: where, orderBy: (s) => [s.id.randomOrder]);
   }
@@ -372,25 +430,31 @@ abstract class DbTableProvider<T extends DbModel> {
   bool _processing = false;
   List<Function()> _watchers = [];
 
+  /// Set this provider as processing some operation.
   @protected
   set isProcessing(bool value) {
     if (value != _processing) {
       _processing = value;
-      callWatchers();
+      _callWatchers();
     }
   }
 
+  /// Get weather this provider is processing an operation.
   bool get isProcessing => _processing;
 
-  void callWatchers() {
+  void _callWatchers() {
     for (var w in _watchers) w.call();
   }
 
+  /// Add a listener that be called when some change occured.
   void addListener(Function() listener) => _watchers.add(listener);
+
+  /// Remove a change listner.
   void removeListener(Function() listener) => _watchers.remove(listener);
 
+  /// Get [entries] from the table that match [where] condition.
   Future<List<T>> selectWhere(ConditionQuery Function(T e) where,
-          {List<OrderField> Function(T e)? orderBy,
+          {List<FieldOrder> Function(T e)? orderBy,
           int? offset,
           int? limit,
           List<FieldWithValue> Function(T e)? desiredFields}) async =>
@@ -401,9 +465,10 @@ abstract class DbTableProvider<T extends DbModel> {
           limit: limit,
           desiredFields: desiredFields);
 
+  /// Get [entries] from the table.
   Future<List<T>> select(
       {ConditionQuery Function(T e)? where,
-      List<OrderField> Function(T e)? orderBy,
+      List<FieldOrder> Function(T e)? orderBy,
       int? offset,
       int? limit,
       List<FieldWithValue> Function(T e)? desiredFields}) async {
@@ -421,6 +486,7 @@ abstract class DbTableProvider<T extends DbModel> {
     return result;
   }
 
+  /// Query some rows with specified fields from this table.
   Future query(
       {List<QueryPart> Function(T e)? queries,
       ConditionQuery Function(T e)? where,
@@ -428,7 +494,7 @@ abstract class DbTableProvider<T extends DbModel> {
       int? offset,
       int? limit,
       List<FieldWithValue> Function(T e)? groupBy,
-      List<OrderField> Function(T e)? orderBy}) async {
+      List<FieldOrder> Function(T e)? orderBy}) async {
     List<QueryPart> Function(T a, DbModel? b)? quers;
     if (queries != null) {
       quers = (a, b) => queries.call(a).map((e) => e).toList();
@@ -452,7 +518,7 @@ abstract class DbTableProvider<T extends DbModel> {
       int? offset,
       int? limit,
       List<FieldWithValue> Function(T e)? groupBy,
-      List<OrderField> Function(T e)? orderBy}) async {
+      List<FieldOrder> Function(T e)? orderBy}) async {
     return _query(
         queries: queries,
         joinCondition: joinCondition,
@@ -465,6 +531,7 @@ abstract class DbTableProvider<T extends DbModel> {
         orderBy: orderBy);
   }
 
+  /// Apply inner join.
   Future innerJoinQuery<O extends DbModel>(
       List<QueryPart> Function(T a, O? b) queries,
       ConditionQuery Function(T a, O? b) joinCondition,
@@ -473,7 +540,7 @@ abstract class DbTableProvider<T extends DbModel> {
       int offset,
       int limit,
       List<FieldWithValue> Function(T e) groupBy,
-      List<OrderField> Function(T e) orderBy) async {
+      List<FieldOrder> Function(T e) orderBy) async {
     return _queryJoin(
         queries: queries,
         joinCondition: joinCondition,
@@ -486,6 +553,7 @@ abstract class DbTableProvider<T extends DbModel> {
         orderBy: orderBy);
   }
 
+  /// Apply left join.
   Future leftJoinQuery<O extends DbModel>(
       List<QueryPart> Function(T a, O? b) queries,
       ConditionQuery Function(T a, O b) joinCondition,
@@ -494,7 +562,7 @@ abstract class DbTableProvider<T extends DbModel> {
       int offset,
       int limit,
       List<FieldWithValue> Function(T e) groupBy,
-      List<OrderField> Function(T e) orderBy) async {
+      List<FieldOrder> Function(T e) orderBy) async {
     return _queryJoin(
         queries: queries,
         joinCondition: joinCondition,
@@ -517,7 +585,7 @@ abstract class DbTableProvider<T extends DbModel> {
       int? offset,
       int? limit,
       List<FieldWithValue> Function(T e)? groupBy,
-      List<OrderField> Function(T e)? orderBy}) async {
+      List<FieldOrder> Function(T e)? orderBy}) async {
     var a = _createInstance();
     var b = otherJoinTable?._createInstance();
     String queryString = '';
@@ -599,22 +667,30 @@ abstract class DbTableProvider<T extends DbModel> {
 
     if (limit != null) queryString += ' LIMIT $limit';
     if (offset != null) queryString += ' OFFSET $offset';
-    var db = await initializeDB();
-    var results = await (db).rawQuery(queryString, queryArgs);
+    var db = await _initializeDB();
+    var results;
+
+    // if (kIsWeb) {
+    //   results = await _webSqlExecuteQuery(db, queryString, queryArgs);
+    // } else
+    results = await (db).rawQuery(queryString, queryArgs);
 
     var r = results.toList();
     return r;
   }
 
+  /// Delete entries from this table,
+  /// if [where] is null it will delete every entry, otherwise it delete only matching entries.
   Future delete({
     ConditionQuery Function(T e)? where,
   }) async {
     for (var entry in await select(where: where)) await deleteEntry(entry);
   }
 
+  /// Get first row first field value
   Future queryFirstValue(QueryPart Function(T model) query,
       {ConditionQuery Function(T model)? where,
-      List<OrderField> Function(T model)? orderBy}) async {
+      List<FieldOrder> Function(T model)? orderBy}) async {
     // assert(query != null);
     var result = await this.query(
         queries: (model) => [query.call(model)],
@@ -630,9 +706,10 @@ abstract class DbTableProvider<T extends DbModel> {
     return null;
   }
 
+  /// Get first entry matching the query.
   Future<T?> selectFirst(
       {ConditionQuery Function(T model)? where,
-      List<OrderField> Function(T model)? orderBy,
+      List<FieldOrder> Function(T model)? orderBy,
       int? offset,
       List<FieldWithValue> Function(T model)? desiredFields}) async {
     var result = (await select(
@@ -640,8 +717,9 @@ abstract class DbTableProvider<T extends DbModel> {
     return result.length > 0 ? result.first : null;
   }
 
+  /// Get first entry matching [where].
   Future<T?> selectFirstWhere(ConditionQuery Function(T model) where,
-      {List<OrderField> Function(T model)? orderBy,
+      {List<FieldOrder> Function(T model)? orderBy,
       int? offset,
       List<FieldWithValue> Function(T model)? desiredFields}) async {
     var result = (await select(
@@ -651,10 +729,12 @@ abstract class DbTableProvider<T extends DbModel> {
 
   List<Function(EntryChangeType changeType, T entry)> _entryListners = [];
 
+  /// Add a listener that be called when some [EntryChangeType] occured.
   void addEntryChangeListner(
           Function(EntryChangeType changeType, T entry) lisnter) =>
       _entryListners.add(lisnter);
 
+  /// rempve a listener from change listners
   void removeEntryChangeListner(
           Function(EntryChangeType changeType, T entry) lisnter) =>
       _entryListners.remove(lisnter);

@@ -1,6 +1,12 @@
-import '../../quds_db.dart';
+part of '../../quds_db.dart';
 
+/// DateTime db field representation.
+///
+/// It's being stored as string in the db.
+///
+/// [DateTimeStringField] supports several db functions.
 class DateTimeStringField extends FieldWithValue<DateTime> {
+  /// Create an instance of [DateTimeStringField]
   DateTimeStringField(
       {String? columnName,
       bool? notNull,
@@ -14,31 +20,64 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
             jsonMapName: jsonMapName,
             jsonMapType: DateTime);
 
-  OrderField get earlierOrder => this.ascOrder;
-  OrderField get laterOrder => this.descOrder;
+  /// Get db order statement to order from older to newer dates
+  FieldOrder get earlierOrder => this.ascOrder;
 
+  /// Get db order statement to order from newer to older dates
+  FieldOrder get laterOrder => this.descOrder;
+
+  /// Get db statement to check if this value more than another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery moreThan(dynamic other) {
     return ConditionQuery(operatorString: '>', before: this, after: other);
   }
 
+  /// Get db statement to check if this value less than another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery lessThan(dynamic other) {
     return ConditionQuery(operatorString: '<', before: this, after: other);
   }
 
+  /// Get db statement to check if this value more than or equal another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery moreThanOrEquals(dynamic other) {
     return ConditionQuery(operatorString: '>=', before: this, after: other);
   }
 
+  /// Get db statement to check if this value less than or equal another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery lessThanOrEquals(dynamic other) {
     return ConditionQuery(operatorString: '<=', before: this, after: other);
   }
 
+  /// Get db statement to check if this value more than another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery operator >(dynamic other) => moreThan(other);
+
+  /// Get db statement to check if this value more than or equal another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery operator >=(dynamic other) => moreThanOrEquals(other);
+
+  /// Get db statement to check if this value less than another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery operator <(dynamic other) => lessThan(other);
+
+  /// Get db statement to check if this value less than or equal another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
   ConditionQuery operator <=(dynamic other) => lessThanOrEquals(other);
 
-  ConditionQuery between(min, max) {
+  /// Get db statement to check if this value less than another date,
+  ///
+  /// [other] may be [DateTime] object or [DateTimeStringField]
+  ConditionQuery between(dynamic min, dynamic max) {
     DbFunctions.assertDateTimeStringsValues([min, max]);
     var q = ConditionQuery();
     String qString = '(${this.buildQuery()} BETWEEN ';
@@ -61,23 +100,51 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return q;
   }
 
+  /// Get [IntField] with value of this field year component.
   IntField get dayOfYear => _componentAsInteger('j');
+
+  /// Get [IntField] with value of this field fractional second component.
   IntField get fractionalSecond => _componentAsInteger('f');
+
+  /// Get [IntField] with value of this field hour component.
   IntField get hour => _componentAsInteger('H');
+
+  /// Get [IntField] with value of this field minute component.
   IntField get minute => _componentAsInteger('M');
+
+  /// Get [IntField] with value of this field second component.
   IntField get second => _componentAsInteger('S');
+
+  /// Get [IntField] with value of this field seconds from Epoch.
   IntField get secondFromEpoch => _componentAsInteger('s');
+
+  /// Get [IntField] with value of this field day of week.
   IntField get dayOfWeek => _componentAsInteger('w');
+
+  /// Get [IntField] with value of this field week of year.
   IntField get weekOfYear => _componentAsInteger('W');
+
+  /// Get [IntField] with value of this field julian day.
   IntField get julianDay => _componentAsInteger('J');
 
+  /// Get [IntField] with value of this field day component.
+  ///
+  /// In another words `day of month`
   IntField get day => _componentAsInteger('d');
+
+  /// Get [StringField] with day part as string.
   StringField get dayAsString => _componentAsString('d');
 
+  /// Get [IntField] with value of this field month component.
   IntField get month => _componentAsInteger('m');
+
+  /// Get [StringField] with month part as string.
   StringField get monthAsString => _componentAsString('m');
 
+  /// Get [IntField] with value of this field year component.
   IntField get year => _componentAsInteger('Y');
+
+  /// Get [StringField] with year part as string.
   StringField get yearAsString => _componentAsString('Y');
 
   IntField _componentAsInteger(String format) {
@@ -95,6 +162,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get db statement to check weather this field has same day and month parts of another [DateTime] object.
   ConditionQuery isSameDayAndMonth(DateTime d) {
     return this.day.equals(d.day) & this.month.equals(d.month);
   }
@@ -115,6 +183,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get the db date part of this value.
   DateTimeStringField get datePart {
     var result = DateTimeStringField();
     result.queryBuilder = () => "DATE(${this.buildQuery()})";
@@ -122,6 +191,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get a statement to check weather now has same day and month of this value.
   ConditionQuery isBirthday() {
     var now = DateTimeStringField.now;
     var result = ConditionQuery();
@@ -131,6 +201,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get an [IntField] with age calculated.
   IntField get age {
     var result = IntField();
     result.queryBuilder = () =>
@@ -139,6 +210,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get the db time part of this value.
   DateTimeStringField get timePart {
     var result = DateTimeStringField();
     result.queryBuilder = () => "TIME(${this.buildQuery()})";
@@ -146,6 +218,7 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get a [DateTimeStringField] with `now` db representation.
   static DateTimeStringField get now {
     var result = DateTimeStringField();
     result.queryBuilder = () => "DATETIME('now')";

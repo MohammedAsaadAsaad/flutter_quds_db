@@ -1,11 +1,24 @@
-import '../../quds_db.dart';
+part of '../../quds_db.dart';
 
+/// Represents a binary operator with two operands statement.
 class OperatorQuery<T> extends QueryPart {
+  /// The operator text, for example:
+  ///
+  /// `<` `>` `AND` `=`
   final String? operatorText;
-  dynamic? before;
-  dynamic? after;
 
-  OperatorQuery(this.operatorText, this.before, this.after);
+  /// The left operand.
+  ///
+  /// [before] may be any query part or of any dart native type.
+  dynamic before;
+
+  /// The right operand.
+  ///
+  /// [after] may be any query part or of any dart native type.
+  dynamic after;
+
+  /// Create an instance of [OperatorQuery]
+  OperatorQuery(this.operatorText, this.before, this.after) : super._();
 
   @override
   String buildQuery() {

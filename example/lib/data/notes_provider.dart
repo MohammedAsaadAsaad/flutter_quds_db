@@ -1,4 +1,4 @@
-import 'package:quds_db/quds_db/db_table_provider.dart';
+import 'package:quds_db/quds_db.dart';
 import 'note.dart';
 
 NotesProvider notesProvider = NotesProvider();

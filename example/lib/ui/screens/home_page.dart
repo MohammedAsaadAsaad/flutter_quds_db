@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:example/data/note.dart';
 import 'package:example/data/notes_provider.dart';
-import 'package:quds_db/quds_db/entry_change_type.dart';
+import 'package:quds_db/quds_db.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, this.title}) : super(key: key);
@@ -86,6 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     await notesProvider.insertEntry(n);
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('New Note added with id:${n.id}')));
+      SnackBar(
+        content: Text('New Note added with id:${n.id}'),
+        duration: const Duration(milliseconds: 200),
+      ),
+    );
   }
 }
