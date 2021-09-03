@@ -62,7 +62,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   ///
   /// `serverId INT UNIQUE`
   String get columnDefinition {
-    String result = '$columnName ${DbHelper._getFieldTypeAffinity(T)}';
+    String result = '$columnName ${DbHelper._getFieldTypeAffinity(valueType)}';
     if (notNull == true) result += ' NOT NULL';
     if (isUnique == true) result += ' UNIQUE';
     return result;

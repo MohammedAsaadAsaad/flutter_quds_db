@@ -51,8 +51,16 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [for (var n in notes) _buildNote(n)],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addNote,
-        tooltip: 'add note',
+        onPressed: () async {
+          await _addNotes();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('new note added'),
+              duration: const Duration(milliseconds: 200),
+            ),
+          );
+        },
+        tooltip: 'add notes',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -60,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildNote(Note n) {
     return ListTile(
-      title:
-          Text((n.isImportant.value! ? '[Important] ' : '') + n.title.value!),
+      title: Text('[${(n.importance.value ?? Importance.normal).toString()}] ' +
+          n.title.value!),
       subtitle: Text(n.content.value!),
       trailing: IconButton(
         icon: Icon(Icons.delete),
@@ -75,21 +83,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _addNote() async {
-    Note n = Note();
-    n.title.value = 'New note';
-    n.content.value = 'Note content, descripe your self';
-    n.isImportant.value = ([true, false]..shuffle()).first;
-    n.color.value = ([Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)]
-          ..shuffle())
-        .first;
+  Future<void> _addNotes() async {
+    var notes = [
+      for (var i = 0; i < 1; i++)
+        Note()
+          ..title.value = 'New note'
+          ..content.value = 'Note content, describe your self'
+          ..importance.value = (Importance.values.toList()..shuffle()).first
+          ..color.value = ([
+            Color(0xffff0000),
+            Color(0xff00ff00),
+            Color(0xff0000ff)
+          ]..shuffle())
+              .first
+    ];
 
-    await notesProvider.insertEntry(n);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('New Note added with id:${n.id}'),
-        duration: const Duration(milliseconds: 200),
-      ),
-    );
+    await notesProvider.insertCollection(notes);
   }
 }

@@ -5,23 +5,20 @@ class DbHelper {
   /// To prevent creating instances of [DbHelper].
   DbHelper._();
 
-// All disabled field types are not supported in web
   static Map<String, List<Type>> _fieldType = const {
-    'TEXT': const [
-      String,
-    ],
+    'TEXT': const [String, Map],
     'INTEGER': const [
       Color,
       DateTime,
       int,
-      // Int32,
-      // Int16,
-      // Int64,
-      // Int8,
-      // Uint16,
-      // Uint32,
-      // Uint64,
-      // Uint8
+      Int32,
+      Int16,
+      Int64,
+      Int8,
+      Uint16,
+      Uint32,
+      Uint64,
+      Uint8
     ],
     'BIT': const [
       bool,
@@ -47,29 +44,22 @@ class DbHelper {
   /// The main db path where all tables to be saved untill one is customized.
   static String mainDbPath = 'data.db';
 
-  static Map<Type, sqlite_api.Database> _createdTablesWindows = new Map();
-  static Map<Type, sqflite.Database> _createdTablesCross = new Map();
-  static Map<Type, dynamic> _createdTablesWeb = new Map();
+  static Map<String, sqlite_api.Database> _createdTablesWindows = new Map();
+  static Map<String, sqflite.Database> _createdTablesCross = new Map();
 
   /// Check [DbTableProvider] 's table in the db and create or modify as required.
   static Future _checkDbAndTable(DbTableProvider dbProvider) async {
-    var map = kIsWeb
-        ? _createdTablesWeb
-        : Platform.isWindows
-            ? _createdTablesWindows
-            : _createdTablesCross;
-
-    if (map[dbProvider.runtimeType] != null) return map[dbProvider.runtimeType];
+    var map = Platform.isWindows ? _createdTablesWindows : _createdTablesCross;
 
     String dbPath = (dbProvider._specialDbFile == null ||
             dbProvider._specialDbFile!.trim().isEmpty)
         ? DbHelper.mainDbPath
         : dbProvider._specialDbFile!;
+    String mapKey = dbPath + '.' + dbProvider.tableName;
+
+    if (map[mapKey] != null) return map[mapKey];
 
     var database;
-    // if (kIsWeb) {
-    //   database = await _webSqlOpenDatabase(dbPath);
-    // } else
     if (Platform.isWindows) {
       database = await sqflite_ffi.databaseFactoryFfi.openDatabase(dbPath);
     } else {
@@ -77,7 +67,7 @@ class DbHelper {
     }
 
     await _createTablesInDB(dbProvider, database);
-    map[dbProvider.runtimeType] = database;
+    map[mapKey] = database;
     return database;
   }
 
@@ -142,6 +132,15 @@ class DbHelper {
                     : value is String
                         ? Color(int.parse(value.toString()))
                         : null;
+
+      case Map:
+        return value is Map
+            ? value
+            : value == null
+                ? null
+                : value is String
+                    ? json.decode(value)
+                    : null;
     }
     return null;
   }
@@ -156,7 +155,7 @@ class DbHelper {
           : DateTime.fromMillisecondsSinceEpoch(dbValue);
 
     if (type == Color) return dbValue == null ? null : Color(dbValue);
-
+    if (type == Map) return dbValue == null ? null : json.decode(dbValue);
     return dbValue;
   }
 
@@ -174,6 +173,8 @@ class DbHelper {
       return value == null ? null : value.millisecondsSinceEpoch;
 
     if (type == Color) return value == null ? null : (value as Color).value;
+
+    if (value is Map) return json.encode(value);
 
     return value;
   }

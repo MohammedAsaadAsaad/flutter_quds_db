@@ -65,7 +65,7 @@ NotesProvider notesProvider = NotesProvider();
 ``` 
     Note n = Note();
     n.title.value = 'New note';
-    n.content.value = 'Note content, descripe your self';
+    n.content.value = 'Note content, describe your self';
     n.isImportant.value = ([true, false]..shuffle()).first;
     n.color.value = ([Colors.red, Colors.blue, Colors.yellow, Colors.orange]
           ..shuffle())

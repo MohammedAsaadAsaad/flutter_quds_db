@@ -27,41 +27,28 @@ abstract class DbTableProvider<T extends DbModel> {
 
   sqlite_api.Database? _databaseWindows;
   sqflite.Database? _databaseCross;
-  dynamic _databaseWeb;
   bool _databaseInitialized = false;
 
   /// Initialize the database, check this table, create an modify as required.
   Future _initializeDB() async {
     if (_databaseInitialized)
-      return kIsWeb
-          ? _databaseWeb
-          : Platform.isWindows
-              ? _databaseWindows
-              : _databaseCross;
+      return Platform.isWindows ? _databaseWindows : _databaseCross;
 
-    kIsWeb
-        ? _databaseWeb = await DbHelper._checkDbAndTable(this)
-        : Platform.isWindows
-            ? _databaseWindows = await DbHelper._checkDbAndTable(this)
-            : _databaseCross = await DbHelper._checkDbAndTable(this);
+    Platform.isWindows
+        ? _databaseWindows = await DbHelper._checkDbAndTable(this)
+        : _databaseCross = await DbHelper._checkDbAndTable(this);
 
     _databaseInitialized = true;
-    return kIsWeb
-        ? _databaseWeb
-        : Platform.isWindows
-            ? _databaseWindows
-            : _databaseCross;
+    return Platform.isWindows ? _databaseWindows : _databaseCross;
   }
 
   /// Close this table database. Cannot be accessed anymore
   Future<bool> closeDB() async {
     try {
       if (_databaseInitialized /*&& database.isOpen*/)
-        kIsWeb
-            ? _databaseWeb?.close()
-            : Platform.isWindows
-                ? _databaseWindows?.close()
-                : _databaseCross?.close();
+        Platform.isWindows
+            ? _databaseWindows?.close()
+            : _databaseCross?.close();
 
       return true;
     } catch (e) {
@@ -71,9 +58,6 @@ abstract class DbTableProvider<T extends DbModel> {
 
   Future<bool> _checkAndCreateTableIfNotExist(dynamic db) async {
     try {
-      // if (kIsWeb) {
-      //   _webSqlExecuteQuery(db, _createStatement);
-      // } else
       db.execute(_createStatement);
       return true;
     } catch (e) {
@@ -86,19 +70,13 @@ abstract class DbTableProvider<T extends DbModel> {
   /// Vacuum this table database.
   Future vacuumDb() async {
     var db = await _initializeDB();
-    // if (kIsWeb)
-    //   _webSqlExecuteQuery(db, 'vacuum;');
-    // else
+
     await db.rawQuery('vacuum;');
   }
 
   Future<bool> _checkEachColumn(dynamic db) async {
     var tableInfo;
 
-    // if (kIsWeb) {
-    //   tableInfo =
-    //       await _webSqlExecuteQuery(db, 'PRAGMA table_info($tableName)');
-    // } else
     tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
 
     var foundColumns = new Map<String, String>();
@@ -670,9 +648,6 @@ abstract class DbTableProvider<T extends DbModel> {
     var db = await _initializeDB();
     var results;
 
-    // if (kIsWeb) {
-    //   results = await _webSqlExecuteQuery(db, queryString, queryArgs);
-    // } else
     results = await (db).rawQuery(queryString, queryArgs);
 
     var r = results.toList();

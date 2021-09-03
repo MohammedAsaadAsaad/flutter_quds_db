@@ -201,6 +201,17 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
     return result;
   }
 
+  /// Get a statement to check weather now has same date part of this value.
+  ConditionQuery isSameDatePart(DateTime d) {
+    var result = ConditionQuery();
+    result.queryBuilder = () => (this.day.equals(d.day) &
+            this.month.equals(d.month) &
+            this.year.equals(d.year))
+        .buildQuery();
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
   /// Get an [IntField] with age calculated.
   IntField get age {
     var result = IntField();
