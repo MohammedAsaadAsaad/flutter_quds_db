@@ -13,10 +13,11 @@ class Note extends DbModel {
 
   var jsonData =
       JsonField(columnName: 'jsonTest', defaultValue: {'hi': 'مرحبا'});
+  var jsonArrayData = ListField(columnName: 'jsonArrayData');
 
   @override
   List<FieldWithValue>? getFields() =>
-      [title, content, color, importance, jsonData];
+      [title, content, color, importance, jsonData, jsonArrayData];
 }
 
 enum Importance { normal, important, veryImportant }

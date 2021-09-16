@@ -25,31 +25,23 @@ abstract class DbTableProvider<T extends DbModel> {
     return cS;
   }
 
-  sqlite_api.Database? _databaseWindows;
-  sqflite.Database? _databaseCross;
+  late sqflite_api.Database _database;
   bool _databaseInitialized = false;
 
   /// Initialize the database, check this table, create an modify as required.
-  Future _initializeDB() async {
-    if (_databaseInitialized)
-      return Platform.isWindows ? _databaseWindows : _databaseCross;
+  Future<sqflite_api.Database> _initializeDB() async {
+    if (_databaseInitialized) return _database;
 
-    Platform.isWindows
-        ? _databaseWindows = await DbHelper._checkDbAndTable(this)
-        : _databaseCross = await DbHelper._checkDbAndTable(this);
+    _database = await DbHelper._checkDbAndTable(this);
 
     _databaseInitialized = true;
-    return Platform.isWindows ? _databaseWindows : _databaseCross;
+    return _database;
   }
 
   /// Close this table database. Cannot be accessed anymore
   Future<bool> closeDB() async {
     try {
-      if (_databaseInitialized /*&& database.isOpen*/)
-        Platform.isWindows
-            ? _databaseWindows?.close()
-            : _databaseCross?.close();
-
+      if (_databaseInitialized /*&& database.isOpen*/) _database.close();
       return true;
     } catch (e) {
       return false;
@@ -71,7 +63,7 @@ abstract class DbTableProvider<T extends DbModel> {
   Future vacuumDb() async {
     var db = await _initializeDB();
 
-    await db.rawQuery('vacuum;');
+    await db.execute('vacuum;');
   }
 
   Future<bool> _checkEachColumn(dynamic db) async {
@@ -136,7 +128,7 @@ abstract class DbTableProvider<T extends DbModel> {
       }
       var result = await batch.commit();
       for (int i = 0; i < entries.length; i++) {
-        entries[i].id.value = result[i];
+        entries[i].id.value = result[i] as int;
         _fireChangeListners(EntryChangeType.Insertion, entries[i]);
       }
     } catch (e) {
@@ -243,8 +235,8 @@ abstract class DbTableProvider<T extends DbModel> {
   Future<bool> insertCollectionInTransaction(List<T> entries) async {
     if (entries.length == 0) return true;
     try {
-      var db = await _initializeDB() as sqflite.Database;
-      await db.transaction((sqflite.Transaction tx) async {
+      var db = await _initializeDB();
+      await db.transaction((sqflite_api.Transaction tx) async {
         for (var entry in entries) {
           await entry.beforeSave(true);
           var map = new Map<String, dynamic>();
@@ -391,8 +383,8 @@ abstract class DbTableProvider<T extends DbModel> {
   }
 
   /// Remove all entries in this table permenantly.
-  Future deleteAllEntries() async {
-    await delete();
+  Future deleteAllEntries({bool withRelatedItems = true}) async {
+    await delete(withRelatedItems: withRelatedItems);
   }
 
   /// Get a collection of entries from this table using thier ids.
@@ -657,9 +649,29 @@ abstract class DbTableProvider<T extends DbModel> {
   /// Delete entries from this table,
   /// if [where] is null it will delete every entry, otherwise it delete only matching entries.
   Future delete({
+    bool withRelatedItems = true,
     ConditionQuery Function(T e)? where,
   }) async {
-    for (var entry in await select(where: where)) await deleteEntry(entry);
+    if (!withRelatedItems) {
+      if (where != null) {
+        var ids = (await select(where: where, desiredFields: (s) => [s.id]))
+            .map((e) => e.id.value!);
+
+        int result = 0;
+        var db = await _initializeDB();
+        result = await db
+            .delete(tableName, where: "$idColumnName IN ?", whereArgs: [ids]);
+        return result;
+      } else {
+        int result = 0;
+        var db = await _initializeDB();
+        result = await db.delete(
+          tableName,
+        );
+        return result;
+      }
+    } else
+      for (var entry in await select(where: where)) await deleteEntry(entry);
   }
 
   /// Get first row first field value

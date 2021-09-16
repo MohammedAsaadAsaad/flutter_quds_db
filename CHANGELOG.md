@@ -32,3 +32,6 @@
 
 ## [0.0.4+2]
 * Add Support to save json data in the db
+
+## [0.0.4+3]
+* Add Support to Linux

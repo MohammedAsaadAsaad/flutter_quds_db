@@ -38,13 +38,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadData() async {
     notes.addAll(await notesProvider.select());
-    setState(() {});
+
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              await notesProvider.deleteAllEntries(withRelatedItems: false);
+              notes.clear();
+              _loadData();
+            },
+          ),
+          if (notes.length > 0)
+            IconButton(
+              icon: Icon(Icons.info),
+              onPressed: () async {
+                // var n = await notesProvider.selectFirstWhere(
+                //     (model) => model.jsonArrayData.arrayLength > 1);
+              },
+            )
+        ],
         title: Text(widget.title!),
       ),
       body: ListView(
@@ -55,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
           await _addNotes();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('new note added'),
+              content: Text('new notes added'),
               duration: const Duration(milliseconds: 200),
             ),
           );
@@ -85,8 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _addNotes() async {
     var notes = [
-      for (var i = 0; i < 1; i++)
+      for (var i = 0; i < 100; i++)
         Note()
+          ..jsonArrayData.value = ['Hi', 4, 0.6]
           ..title.value = 'New note'
           ..content.value = 'Note content, describe your self'
           ..importance.value = (Importance.values.toList()..shuffle()).first

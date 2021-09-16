@@ -1,6 +1,8 @@
 # Quds Db
 Is an automated version of sqflite!
 
+<a href='https://www.paypal.com/donate?hosted_button_id=94Y2Q9LQR9XHS'><img src="https://raw.githubusercontent.com/aha999/DonateButtons/master/Paypal.png" width=250/></a>
+
 ## How to use
 #### 1. To create a model
 Model classes should extend DbModel class.
@@ -10,8 +12,9 @@ Supported field type:
 |-|-|-|-|
 |IdField|StringField|DateTimeField (saved as num)|BlobField|
 IntField||DateTimeStringField (Saved as string)|BoolField|
-|NumField|||ColorField|
-|DoubleField||
+|NumField|||<img src="https://cdn2.iconfinder.com/data/icons/Siena/48/label_new%20red.png" width=24>JsonField<br><img src="https://cdn2.iconfinder.com/data/icons/Siena/48/label_new%20red.png" width=24>ListField|
+|DoubleField|||ColorField|
+||||EnumField|
 
 ```
 class Note extends DbModel {
@@ -31,6 +34,7 @@ Every model has default fields:
 - modificationTime (automatically set when created, and with every update operation)
 
 <br/>
+
 #### 2. To create a table manager
 ```
 class NotesProvider extends DbTableProvider<Note> {
@@ -99,7 +103,7 @@ await notesProvider.deleteEntry(n);
 
 
 ## Monitoring changes:
-To capture the changes in some table:
+To handle the changes in some table:
 ```
   notesProvider.addEntryChangeListner((changeType, entry) {
       switch (changeType) {
@@ -124,7 +128,7 @@ and to change it:
   DbHelper.mainDbPath = 'your db path';
 ```
 
-And if you want to save a table provider in specified file,
+And if you want to save a table  in other file:
 ```
 class NotesProvider extends DbTableProvider<Note> {
   NotesProvider()

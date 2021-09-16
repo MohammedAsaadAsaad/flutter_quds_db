@@ -6,7 +6,7 @@ class DbHelper {
   DbHelper._();
 
   static Map<String, List<Type>> _fieldType = const {
-    'TEXT': const [String, Map],
+    'TEXT': const [String, Map, List, Object],
     'INTEGER': const [
       Color,
       DateTime,
@@ -42,29 +42,41 @@ class DbHelper {
       v is QueryPart ? v.buildQuery() : '?';
 
   /// The main db path where all tables to be saved untill one is customized.
-  static String mainDbPath = 'data.db';
+  static String? mainDbPath;
 
-  static Map<String, sqlite_api.Database> _createdTablesWindows = new Map();
-  static Map<String, sqflite.Database> _createdTablesCross = new Map();
+  static Map<String, sqflite_api.Database> _createdTables = new Map();
+
+  static bool _initialized = false;
+  static Future<void> _initializeDb() async {
+    if (_initialized) return;
+    mainDbPath = (await path_provider.getApplicationSupportDirectory()).path +
+        '/data.db';
+    _initialized = true;
+
+    if (kDebugMode) {
+      log('_______________Quds Db________________');
+      log('Hi great developer!');
+      log('Would you donate to Quds Db developers team?\nIt will be great help to our team to continue the developement!');
+      log('_____________Donation Link____________');
+      log('https://www.paypal.com/donate?hosted_button_id=94Y2Q9LQR9XHS');
+    }
+  }
 
   /// Check [DbTableProvider] 's table in the db and create or modify as required.
   static Future _checkDbAndTable(DbTableProvider dbProvider) async {
-    var map = Platform.isWindows ? _createdTablesWindows : _createdTablesCross;
+    await _initializeDb();
+    var map = _createdTables;
 
     String dbPath = (dbProvider._specialDbFile == null ||
             dbProvider._specialDbFile!.trim().isEmpty)
-        ? DbHelper.mainDbPath
+        ? DbHelper.mainDbPath!
         : dbProvider._specialDbFile!;
     String mapKey = dbPath + '.' + dbProvider.tableName;
 
     if (map[mapKey] != null) return map[mapKey];
 
-    var database;
-    if (Platform.isWindows) {
-      database = await sqflite_ffi.databaseFactoryFfi.openDatabase(dbPath);
-    } else {
-      database = await sqflite.openDatabase(dbPath);
-    }
+    var database = await sqflite_ffi.databaseFactoryFfi.openDatabase(dbPath);
+    // await _initializeSupportDbFunction(database);
 
     await _createTablesInDB(dbProvider, database);
     map[mapKey] = database;
@@ -141,6 +153,15 @@ class DbHelper {
                 : value is String
                     ? json.decode(value)
                     : null;
+
+      case List:
+        return value is List
+            ? value
+            : value == null
+                ? null
+                : value is String
+                    ? json.decode(value)
+                    : null;
     }
     return null;
   }
@@ -156,6 +177,7 @@ class DbHelper {
 
     if (type == Color) return dbValue == null ? null : Color(dbValue);
     if (type == Map) return dbValue == null ? null : json.decode(dbValue);
+    if (type == List) return dbValue == null ? null : json.decode(dbValue);
     return dbValue;
   }
 
@@ -175,7 +197,14 @@ class DbHelper {
     if (type == Color) return value == null ? null : (value as Color).value;
 
     if (value is Map) return json.encode(value);
+    if (value is List) return json.encode(value);
 
     return value;
   }
+
+  // static Future<void> _initializeSupportDbFunction(
+  //     sqflite_api.Database db) async {
+  //   // db.createAggregateFunction(
+  //   //     functionName: 'test_function', function: ATanFunction());
+  // }
 }
