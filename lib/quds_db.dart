@@ -5,14 +5,15 @@ library sqlite_quds_db;
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ffi';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:core';
 import 'dart:ui';
-import 'package:sqflite_common/sqlite_api.dart' as sqflite_api;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'quds_db/support_functions/support_functions.dart';
 
 // library quds_db;
 part 'quds_db/data_page_query.dart';
@@ -22,6 +23,7 @@ part 'quds_db/db_helper.dart';
 part 'quds_db/db_model.dart';
 part 'quds_db/db_table_provider.dart';
 part 'quds_db/entry_change_type.dart';
+part 'quds_db/database_operations.dart';
 
 //Query parts
 part 'quds_db/query_parts/query_part.dart';

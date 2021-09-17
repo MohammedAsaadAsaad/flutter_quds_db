@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _addNotes() async {
     var notes = [
-      for (var i = 0; i < 100; i++)
+      for (var i = 0; i < 10000; i++)
         Note()
           ..jsonArrayData.value = ['Hi', 4, 0.6]
           ..title.value = 'New note'

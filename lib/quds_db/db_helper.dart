@@ -44,7 +44,7 @@ class DbHelper {
   /// The main db path where all tables to be saved untill one is customized.
   static String? mainDbPath;
 
-  static Map<String, sqflite_api.Database> _createdTables = new Map();
+  static Map<String, sqlite.Database> _createdTables = new Map();
 
   static bool _initialized = false;
   static Future<void> _initializeDb() async {
@@ -75,8 +75,8 @@ class DbHelper {
 
     if (map[mapKey] != null) return map[mapKey];
 
-    var database = await sqflite_ffi.databaseFactoryFfi.openDatabase(dbPath);
-    // await _initializeSupportDbFunction(database);
+    var database = sqlite.sqlite3.open(dbPath);
+    initializeSupportFunctions(database);
 
     await _createTablesInDB(dbProvider, database);
     map[mapKey] = database;
@@ -201,10 +201,4 @@ class DbHelper {
 
     return value;
   }
-
-  // static Future<void> _initializeSupportDbFunction(
-  //     sqflite_api.Database db) async {
-  //   // db.createAggregateFunction(
-  //   //     functionName: 'test_function', function: ATanFunction());
-  // }
 }

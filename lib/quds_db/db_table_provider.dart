@@ -25,11 +25,11 @@ abstract class DbTableProvider<T extends DbModel> {
     return cS;
   }
 
-  late sqflite_api.Database _database;
+  late sqlite.Database _database;
   bool _databaseInitialized = false;
 
   /// Initialize the database, check this table, create an modify as required.
-  Future<sqflite_api.Database> _initializeDB() async {
+  Future<sqlite.Database> _initializeDB() async {
     if (_databaseInitialized) return _database;
 
     _database = await DbHelper._checkDbAndTable(this);
@@ -41,7 +41,7 @@ abstract class DbTableProvider<T extends DbModel> {
   /// Close this table database. Cannot be accessed anymore
   Future<bool> closeDB() async {
     try {
-      if (_databaseInitialized /*&& database.isOpen*/) _database.close();
+      if (_databaseInitialized /*&& database.isOpen*/) _database.dispose();
       return true;
     } catch (e) {
       return false;
@@ -62,8 +62,7 @@ abstract class DbTableProvider<T extends DbModel> {
   /// Vacuum this table database.
   Future vacuumDb() async {
     var db = await _initializeDB();
-
-    await db.execute('vacuum;');
+    db.execute('vacuum;');
   }
 
   Future<bool> _checkEachColumn(dynamic db) async {
@@ -101,7 +100,7 @@ abstract class DbTableProvider<T extends DbModel> {
       entry.creationTime.value = DateTime.now();
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
-      result = await db.insert(tableName, map);
+      result = await db.insert(tableName, map) ?? 0;
       entry.id.value = result;
       await entry.afterSave(true);
       _fireChangeListners(EntryChangeType.Insertion, entry);
@@ -116,19 +115,23 @@ abstract class DbTableProvider<T extends DbModel> {
     if (entries.length == 0) return;
     try {
       var db = await _initializeDB();
-      var batch = db.batch();
-      for (var entry in entries) {
-        await entry.beforeSave(true);
+      List<Map<String, dynamic>> maps = [];
+      for (var e in entries) {
         var map = new Map<String, dynamic>();
-        entry.creationTime.value = DateTime.now();
-        entry.modificationTime.value = DateTime.now();
-        _setEntryToMap(entry, map);
-        batch.insert(tableName, map);
-        await entry.afterSave(true);
+        e.creationTime.value = DateTime.now();
+        e.modificationTime.value = DateTime.now();
+        _setEntryToMap(e, map);
+        maps.add(map);
       }
-      var result = await batch.commit();
+      for (var entry in entries) await entry.beforeSave(true);
+
+      var result = await db.insertBuilk(tableName, maps);
+      if (result != null) {
+        for (int i = 0; i < result.length; i++) entries[i].id.value = result[i];
+      }
+      for (var entry in entries) await entry.afterSave(true);
+
       for (int i = 0; i < entries.length; i++) {
-        entries[i].id.value = result[i] as int;
         _fireChangeListners(EntryChangeType.Insertion, entries[i]);
       }
     } catch (e) {
@@ -142,20 +145,24 @@ abstract class DbTableProvider<T extends DbModel> {
   Future<void> updateCollectionById(List<T> entries) async {
     try {
       var db = await _initializeDB();
-      var batch = db.batch();
-      for (var entry in entries) {
-        await entry.beforeSave(true);
+      for (var e in entries) await e.beforeSave(false);
+
+      List<Map<String, dynamic>> maps = [];
+      for (var e in entries) {
+        e.modificationTime.value = DateTime.now();
         var map = new Map<String, dynamic>();
-        entry.creationTime.value = DateTime.now();
-        entry.modificationTime.value = DateTime.now();
-        _setEntryToMap(entry, map);
-        batch.update(tableName, map,
-            where: '$idColumnName = ${entry.id.value}');
-        await entry.afterSave(true);
+        _setEntryToMap(e, map);
+        maps.add(map);
       }
-      await batch.commit();
+
+      await db.updateBulk(tableName, maps, [
+        '$idColumnName=?'
+      ], [
+        for (var e in entries) [e.id.value]
+      ]);
+      for (var e in entries) await e.afterSave(false);
+
       for (int i = 0; i < entries.length; i++) {
-        // items[i].id = result[i];
         _fireChangeListners(EntryChangeType.Modification, entries[i]);
       }
     } catch (e) {
@@ -169,20 +176,24 @@ abstract class DbTableProvider<T extends DbModel> {
   Future<void> updateCollectionByServerId(List<T> entries) async {
     try {
       var db = await _initializeDB();
-      var batch = db.batch();
-      for (var entry in entries) {
-        await entry.beforeSave(true);
+      for (var e in entries) await e.beforeSave(false);
+
+      List<Map<String, dynamic>> maps = [];
+      for (var e in entries) {
+        e.modificationTime.value = DateTime.now();
         var map = new Map<String, dynamic>();
-        entry.creationTime.value = DateTime.now();
-        entry.modificationTime.value = DateTime.now();
-        _setEntryToMap(entry, map);
-        batch.update(tableName, map,
-            where: 'serverId = ${entry.serverId.value}');
-        await entry.afterSave(true);
+        _setEntryToMap(e, map);
+        maps.add(map);
       }
-      await batch.commit();
+
+      await db.updateBulk(tableName, maps, [
+        'serverId=?'
+      ], [
+        for (var e in entries) [e.serverId.value]
+      ]);
+      for (var e in entries) await e.afterSave(false);
+
       for (int i = 0; i < entries.length; i++) {
-        // items[i].id = result[i];
         _fireChangeListners(EntryChangeType.Modification, entries[i]);
       }
     } catch (e) {
@@ -235,20 +246,7 @@ abstract class DbTableProvider<T extends DbModel> {
   Future<bool> insertCollectionInTransaction(List<T> entries) async {
     if (entries.length == 0) return true;
     try {
-      var db = await _initializeDB();
-      await db.transaction((sqflite_api.Transaction tx) async {
-        for (var entry in entries) {
-          await entry.beforeSave(true);
-          var map = new Map<String, dynamic>();
-          entry.creationTime.value = DateTime.now();
-          entry.modificationTime.value = DateTime.now();
-          _setEntryToMap(entry, map);
-          tx.insert(tableName, map);
-          await entry.afterSave(true);
-          // _fireChangeListners(EntryChangeType.Insertion, entry);
-        }
-      });
-
+      await insertCollection(entries);
       return true;
     } catch (e) {
       return false;
@@ -638,9 +636,7 @@ abstract class DbTableProvider<T extends DbModel> {
     if (limit != null) queryString += ' LIMIT $limit';
     if (offset != null) queryString += ' OFFSET $offset';
     var db = await _initializeDB();
-    var results;
-
-    results = await (db).rawQuery(queryString, queryArgs);
+    var results = (db).select(queryString, queryArgs);
 
     var r = results.toList();
     return r;

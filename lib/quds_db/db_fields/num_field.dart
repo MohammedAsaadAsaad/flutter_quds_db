@@ -119,11 +119,17 @@ class NumField<T> extends FieldWithValue<T> {
     return DbFunctions.min(this);
   }
 
-  // DoubleField sin() {
-  //   DoubleField result = DoubleField();
-  //   result.queryBuilder = () => 'SIN(${this.buildQuery()})';
-  //   result.parametersBuilder = () => this.getParameters();
-  //   return result;
-  // }
+  DoubleField sin() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'SIN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
 
+  DoubleField atan() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'ATAN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
 }
