@@ -39,6 +39,27 @@ class ListField extends _JsonField<List> {
     result.parametersBuilder = () => this.getParameters();
     return result;
   }
+
+  ListField removeAt(int index) {
+    ListField result = ListField();
+    result.queryBuilder = () => 'json_array_remove(${this.buildQuery()},?)';
+    result.parametersBuilder = () => [...this.getParameters(), index];
+    return result;
+  }
+
+  ListField insertAt(int index, dynamic element) {
+    ListField result = ListField();
+    result.queryBuilder = () => 'json_array_insert(${this.buildQuery()},?,?)';
+    result.parametersBuilder = () => [...this.getParameters(), index, element];
+    return result;
+  }
+
+  ListField add(dynamic element) {
+    ListField result = ListField();
+    result.queryBuilder = () => 'json_array_add(${this.buildQuery()},?)';
+    result.parametersBuilder = () => [...this.getParameters(), element];
+    return result;
+  }
 }
 
 class JsonField extends _JsonField<Map> {

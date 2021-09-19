@@ -165,6 +165,13 @@ class DbFunctions {
     return result;
   }
 
+  /// Get [DoubleField] object with the sqlite version.
+  static DoubleField get pi {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'pi()';
+    return result;
+  }
+
   /// Get [StringField] object with the sqlite source id.
   static StringField get sqliteSourceId {
     StringField result = StringField();

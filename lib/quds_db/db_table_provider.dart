@@ -683,7 +683,10 @@ abstract class DbTableProvider<T extends DbModel> {
 
     if (result != null) {
       if (result is List) {
-        if (result.length > 0) if (result[0] != null) return result[0].row[0];
+        if (result.length > 0) if (result[0] != null) {
+          var r = result[0] as sqlite.Row;
+          return r.entries.first.value;
+        }
       }
     }
     return null;

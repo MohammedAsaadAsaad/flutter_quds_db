@@ -119,6 +119,7 @@ class NumField<T> extends FieldWithValue<T> {
     return DbFunctions.min(this);
   }
 
+  /// Get db value with `SIN(X)` function applied.
   DoubleField sin() {
     DoubleField result = DoubleField();
     result.queryBuilder = () => 'SIN(${this.buildQuery()})';
@@ -126,9 +127,162 @@ class NumField<T> extends FieldWithValue<T> {
     return result;
   }
 
+  /// Get db value with `COS(X)` function applied.
+  DoubleField cos() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'COS(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `TAN(X)` function applied.
+  DoubleField tan() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'TAN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `ASIN(X)` function applied.
+  DoubleField asin() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'ASIN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `ACOS(X)` function applied.
+  DoubleField acos() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'ACOS(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `ATAN(X)` function applied.
   DoubleField atan() {
     DoubleField result = DoubleField();
     result.queryBuilder = () => 'ATAN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `ATAN2(X,Y)` function applied.
+  ///
+  /// Return the arctangent of Y/X. The result is in radians. The result is placed into correct quadrant depending on the signs of X and Y.
+  DoubleField atan2(num y) {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'ATAN2(${this.buildQuery()},?)';
+    result.parametersBuilder = () => [...this.getParameters(), y];
+    return result;
+  }
+
+  /// Convert from radians into degrees.
+  DoubleField toDegrees() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'DEGREES(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `CEIL(X)` function applied.
+  DoubleField ceil() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'CEIL(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `FLOOR(X)` function applied.
+  DoubleField floor() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'FLOOR(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `EXP(X)` function applied.
+  ///
+  /// Compute e (Euler's number, approximately 2.71828182845905) raised to the power X.
+  DoubleField exp() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'EXP(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Convert from degrees into radians.
+  DoubleField toRadians() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'RADIANS(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `LOG(X)` function applied.
+  ///
+  /// Return the base-10 logarithm for X.
+  DoubleField log() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'LOG(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `LN(X)` function applied.
+  ///
+  /// Return the natural logarithm for X.
+  DoubleField ln() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'LN(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `LOG10(X)` function applied.
+  ///
+  /// Return the base-10 logarithm for X.
+  DoubleField log10() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'LOG10(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `LOG2(X)` function applied.
+  ///
+  /// Return the base-2 logarithm for X.
+  DoubleField log2() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'LOG2(${this.buildQuery()})';
+    result.parametersBuilder = () => this.getParameters();
+    return result;
+  }
+
+  /// Get db value with `LOG_B(base,X)` function applied.
+  ///
+  /// Return the `base` logarithm for X.
+  DoubleField logB(num base) {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'LOG_B(?,${this.buildQuery()})';
+    result.parametersBuilder = () => [base, ...this.getParameters()];
+    return result;
+  }
+
+  /// Get db value with `POW(X,power)` function applied.
+  ///
+  /// Return X powered to `power`
+  DoubleField powerTo(num power) {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'POW(${this.buildQuery()},?)';
+    result.parametersBuilder = () => [...this.getParameters(), power];
+    return result;
+  }
+
+  /// Get db value with `SQRT(X)` function applied.
+  DoubleField sqrt() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'SQRT(${this.buildQuery()})';
     result.parametersBuilder = () => this.getParameters();
     return result;
   }

@@ -12,6 +12,49 @@ void _addJsonFunctions(Database db) {
       });
 
   db.createFunction(
+      functionName: 'json_array_remove',
+      argumentCount: AllowedArgumentCount(2),
+      function: (s) {
+        var list = s[0] as String?;
+        var index = s[1] as int?;
+        if (list == null || index == null) return s[0];
+        var listJson = json.decode(list) as List?;
+        if (listJson != null && index >= 0 && index < listJson.length) {
+          listJson.removeAt(index);
+          return json.encode(listJson);
+        }
+      });
+
+  db.createFunction(
+      functionName: 'json_array_insert',
+      argumentCount: AllowedArgumentCount(3),
+      function: (s) {
+        var list = s[0] as String?;
+        var index = s[1] as int?;
+        var entry = s[2];
+        if (list == null || index == null) return s[0];
+        var listJson = json.decode(list) as List?;
+        if (listJson != null && index >= 0 && index < listJson.length) {
+          listJson.insert(index, entry);
+          return json.encode(listJson);
+        }
+      });
+
+  db.createFunction(
+      functionName: 'json_array_add',
+      argumentCount: AllowedArgumentCount(2),
+      function: (s) {
+        var list = s[0] as String?;
+        var entry = s[1];
+        if (list == null) return s[0];
+        var listJson = json.decode(list) as List?;
+        if (listJson != null) {
+          listJson.add(entry);
+          return json.encode(listJson);
+        }
+      });
+
+  db.createFunction(
       functionName: 'contains_key',
       argumentCount: AllowedArgumentCount(2),
       function: (s) {
