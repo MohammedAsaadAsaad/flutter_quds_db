@@ -1,5 +1,7 @@
 part of '../quds_db.dart';
 
+bool _donationDisplayed = false;
+
 /// Provide some helping methods for managing the database.
 class DbHelper {
   /// To prevent creating instances of [DbHelper].
@@ -44,16 +46,18 @@ class DbHelper {
   /// The main db path where all tables to be saved untill one is customized.
   static String? mainDbPath;
 
-  static Map<String, sqlite.Database> _createdTables = new Map();
+  static Map<String, sqlite_api.Database> _createdTables = new Map();
 
   static bool _initialized = false;
   static Future<void> _initializeDb() async {
     if (_initialized) return;
+    WidgetsFlutterBinding.ensureInitialized();
     mainDbPath = (await path_provider.getApplicationSupportDirectory()).path +
         '/data.db';
     _initialized = true;
 
-    if (kDebugMode) {
+    if (kDebugMode && !_donationDisplayed) {
+      _donationDisplayed = true;
       log('_______________Quds Db________________');
       log('Hi great developer!');
       log('Would you donate to Quds Db developers team?\nIt will be great help to our team to continue the developement!');
@@ -63,7 +67,8 @@ class DbHelper {
   }
 
   /// Check [DbTableProvider] 's table in the db and create or modify as required.
-  static Future _checkDbAndTable(DbTableProvider dbProvider) async {
+  static Future<sqlite_api.Database> _checkDbAndTable(
+      DbTableProvider dbProvider) async {
     await _initializeDb();
     var map = _createdTables;
 
@@ -73,10 +78,10 @@ class DbHelper {
         : dbProvider._specialDbFile!;
     String mapKey = dbPath + '.' + dbProvider.tableName;
 
-    if (map[mapKey] != null) return map[mapKey];
+    if (map[mapKey] != null) return map[mapKey]!;
 
-    var database = sqlite.sqlite3.open(dbPath);
-    initializeSupportFunctions(database);
+    var database = await sqflite_ffi.databaseFactoryFfi.openDatabase(dbPath);
+    // initializeSupportFunctions(database);
 
     await _createTablesInDB(dbProvider, database);
     map[mapKey] = database;

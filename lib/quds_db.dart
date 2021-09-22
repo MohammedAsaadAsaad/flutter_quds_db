@@ -2,6 +2,7 @@
 library sqlite_quds_db;
 
 // import 'dart:ffi';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ffi';
@@ -10,9 +11,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:core';
 import 'dart:ui';
-import 'package:sqlite3/sqlite3.dart' as sqlite;
+// import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'quds_db/support_functions/support_functions.dart';
+import 'package:sqflite_common/sqlite_api.dart' as sqlite_api;
+import 'quds_db/sqflite/sqflite_ffi.dart' as sqflite_ffi;
 
 // library quds_db;
 part 'quds_db/data_page_query.dart';
@@ -22,7 +24,7 @@ part 'quds_db/db_helper.dart';
 part 'quds_db/db_model.dart';
 part 'quds_db/db_table_provider.dart';
 part 'quds_db/entry_change_type.dart';
-part 'quds_db/database_operations.dart';
+// part 'quds_db/database_operations.dart';
 
 //Query parts
 part 'quds_db/query_parts/query_part.dart';
