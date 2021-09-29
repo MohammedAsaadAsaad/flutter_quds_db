@@ -4,7 +4,7 @@ import 'package:example/data/notes_provider.dart';
 import 'package:quds_db/quds_db.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
@@ -48,16 +48,16 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
             onPressed: () async {
               await notesProvider.deleteAllEntries(withRelatedItems: false);
               notes.clear();
               _loadData();
             },
           ),
-          if (notes.length > 0)
+          if (notes.isNotEmpty)
             IconButton(
-              icon: Icon(Icons.info),
+              icon: const Icon(Icons.info),
               onPressed: () async {
                 // var n = await notesProvider.selectFirstWhere(
                 //     (model) => model.jsonArrayData.arrayLength > 1);
@@ -73,14 +73,14 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           await _addNotes();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('new notes added'),
-              duration: const Duration(milliseconds: 200),
+              duration: Duration(milliseconds: 200),
             ),
           );
         },
         tooltip: 'add notes',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
           n.title.value!),
       subtitle: Text(n.content.value!),
       trailing: IconButton(
-        icon: Icon(Icons.delete),
+        icon: const Icon(Icons.delete),
         onPressed: () async {
           await notesProvider.deleteEntry(n);
         },
@@ -111,9 +111,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ..content.value = 'Note content, describe your self'
           ..importance.value = (Importance.values.toList()..shuffle()).first
           ..color.value = ([
-            Color(0xffff0000),
-            Color(0xff00ff00),
-            Color(0xff0000ff)
+            const Color(0xffff0000),
+            const Color(0xff00ff00),
+            const Color(0xff0000ff)
           ]..shuffle())
               .first
     ];

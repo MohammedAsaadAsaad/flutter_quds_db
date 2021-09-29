@@ -7,7 +7,7 @@ class NumField<T> extends FieldWithValue<T> {
       {bool? notNull,
       bool? isUnique,
       String? jsonMapName,
-      Type jsonMapType: num})
+      Type jsonMapType = num})
       : super(columnName,
             notNull: notNull,
             isUnique: notNull,
@@ -40,14 +40,14 @@ class NumField<T> extends FieldWithValue<T> {
   ConditionQuery between(min, max) {
     DbFunctions.assertNumValues([min, max]);
     var q = ConditionQuery();
-    String qString = '(${this.buildQuery()} BETWEEN ';
+    String qString = '(${buildQuery()} BETWEEN ';
     qString += (min is NumField) ? min.buildQuery() : '?';
     qString += ' AND ';
     qString += (max is NumField) ? max.buildQuery() : '?';
     qString += ')';
     q.queryBuilder = () => qString;
     q.parametersBuilder = () => [
-          ...this.getParameters(),
+          ...getParameters(),
           if (min is NumField) ...min.getParameters() else min,
           if (max is NumField) ...max.getParameters() else max
         ];
@@ -104,8 +104,8 @@ class NumField<T> extends FieldWithValue<T> {
   DoubleField round([int? digits]) {
     var result = DoubleField();
     result.queryBuilder = () =>
-        'ROUND(' + this.buildQuery() + (digits == null ? ')' : ',$digits)');
-    result.parametersBuilder = () => this.getParameters();
+        'ROUND(' + buildQuery() + (digits == null ? ')' : ',$digits)');
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -122,48 +122,48 @@ class NumField<T> extends FieldWithValue<T> {
   /// Get db value with `SIN(X)` function applied.
   DoubleField sin() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'SIN(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'SIN(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `COS(X)` function applied.
   DoubleField cos() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'COS(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'COS(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `TAN(X)` function applied.
   DoubleField tan() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'TAN(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'TAN(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `ASIN(X)` function applied.
   DoubleField asin() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'ASIN(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'ASIN(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `ACOS(X)` function applied.
   DoubleField acos() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'ACOS(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'ACOS(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `ATAN(X)` function applied.
   DoubleField atan() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'ATAN(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'ATAN(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -172,32 +172,32 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the arctangent of Y/X. The result is in radians. The result is placed into correct quadrant depending on the signs of X and Y.
   DoubleField atan2(num y) {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'ATAN2(${this.buildQuery()},?)';
-    result.parametersBuilder = () => [...this.getParameters(), y];
+    result.queryBuilder = () => 'ATAN2(${buildQuery()},?)';
+    result.parametersBuilder = () => [...getParameters(), y];
     return result;
   }
 
   /// Convert from radians into degrees.
   DoubleField toDegrees() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'DEGREES(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'DEGREES(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `CEIL(X)` function applied.
   DoubleField ceil() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'CEIL(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'CEIL(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get db value with `FLOOR(X)` function applied.
   DoubleField floor() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'FLOOR(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'FLOOR(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -206,16 +206,16 @@ class NumField<T> extends FieldWithValue<T> {
   /// Compute e (Euler's number, approximately 2.71828182845905) raised to the power X.
   DoubleField exp() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'EXP(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'EXP(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Convert from degrees into radians.
   DoubleField toRadians() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'RADIANS(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'RADIANS(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -224,8 +224,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the base-10 logarithm for X.
   DoubleField log() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'LOG(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LOG(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -234,8 +234,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the natural logarithm for X.
   DoubleField ln() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'LN(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LN(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -244,8 +244,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the base-10 logarithm for X.
   DoubleField log10() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'LOG10(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LOG10(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -254,8 +254,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the base-2 logarithm for X.
   DoubleField log2() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'LOG2(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LOG2(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -264,8 +264,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return the `base` logarithm for X.
   DoubleField logB(num base) {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'LOG_B(?,${this.buildQuery()})';
-    result.parametersBuilder = () => [base, ...this.getParameters()];
+    result.queryBuilder = () => 'LOG_B(?,${buildQuery()})';
+    result.parametersBuilder = () => [base, ...getParameters()];
     return result;
   }
 
@@ -274,16 +274,16 @@ class NumField<T> extends FieldWithValue<T> {
   /// Return X powered to `power`
   DoubleField powerTo(num power) {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'POW(${this.buildQuery()},?)';
-    result.parametersBuilder = () => [...this.getParameters(), power];
+    result.queryBuilder = () => 'POW(${buildQuery()},?)';
+    result.parametersBuilder = () => [...getParameters(), power];
     return result;
   }
 
   /// Get db value with `SQRT(X)` function applied.
   DoubleField sqrt() {
     DoubleField result = DoubleField();
-    result.queryBuilder = () => 'SQRT(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'SQRT(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 }

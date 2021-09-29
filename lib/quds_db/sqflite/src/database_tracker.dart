@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:ffi';
 
 import 'package:sqlite3/sqlite3.dart';
@@ -43,7 +45,8 @@ class DatabaseTracker {
               .columnAt(0) as int) >
           0;
       if (!tableExists) {
-        _db!.execute('''
+        _db!.execute(
+            '''
 CREATE TABLE IF NOT EXISTS $_tableName (
   $_ptrColName INTEGER NOT NULL PRIMARY KEY
 );

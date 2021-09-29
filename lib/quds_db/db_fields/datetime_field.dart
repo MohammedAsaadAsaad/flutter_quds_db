@@ -14,10 +14,10 @@ class DateTimeField extends FieldWithValue<DateTime> {
             jsonMapType: DateTime);
 
   /// Get db order statement to order from older to newer dates
-  FieldOrder get earlierOrder => this.ascOrder;
+  FieldOrder get earlierOrder => ascOrder;
 
   /// Get db order statement to order from newer to older dates
-  FieldOrder get laterOrder => this.descOrder;
+  FieldOrder get laterOrder => descOrder;
 
   /// Get db statement to check if this value more than another date,
   ///
@@ -73,14 +73,14 @@ class DateTimeField extends FieldWithValue<DateTime> {
   ConditionQuery between(dynamic min, dynamic max) {
     DbFunctions.assertDateTimesValues([min, max]);
     var q = ConditionQuery();
-    String qString = '(${this.buildQuery()} BETWEEN ';
+    String qString = '(${buildQuery()} BETWEEN ';
     qString += (min is DateTimeField) ? min.buildQuery() : '?';
     qString += ' AND ';
     qString += (max is DateTimeField) ? max.buildQuery() : '?';
     qString += ')';
     q.queryBuilder = () => qString;
     q.parametersBuilder = () => [
-          ...this.getParameters(),
+          ...getParameters(),
           if (min is NumField)
             ...min.getParameters()
           else

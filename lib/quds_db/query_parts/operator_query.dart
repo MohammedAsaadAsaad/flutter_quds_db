@@ -22,7 +22,7 @@ class OperatorQuery<T> extends QueryPart {
 
   @override
   String buildQuery() {
-    if (this.queryBuilder != null) return this.queryBuilder!();
+    if (queryBuilder != null) return queryBuilder!();
     return operatorText == null
         ? ''
         : "(" +

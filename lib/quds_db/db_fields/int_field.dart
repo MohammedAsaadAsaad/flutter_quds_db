@@ -72,12 +72,12 @@ class IntField extends NumField<int> {
     var result = IntField();
     result.queryBuilder = () =>
         '(' +
-        this.buildQuery() +
+        buildQuery() +
         ' $operation ' +
         DbHelper.buildQueryForOperand(other) +
         ')';
     result.parametersBuilder = () => [
-          ...this.getParameters(),
+          ...getParameters(),
           if (other is QueryPart)
             ...other.getParameters()
           else
@@ -95,24 +95,24 @@ class IntField extends NumField<int> {
   /// Get new [IntField] object with db `ABS()` function applied.
   IntField abs() {
     var result = IntField();
-    result.queryBuilder = () => 'ABS(' + this.buildQuery() + ')';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'ABS(' + buildQuery() + ')';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get new [IntField] object with db `AVG()` function applied.
   IntField avg() {
     var result = IntField();
-    result.queryBuilder = () => 'AVG(' + this.buildQuery() + ')';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'AVG(' + buildQuery() + ')';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get new [DoubleField] object with this field value.
   DoubleField toDouble() {
     var result = DoubleField();
-    result.queryBuilder = () => 'CAST(' + this.buildQuery() + ' AS REAL)';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'CAST(' + buildQuery() + ' AS REAL)';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 

@@ -24,7 +24,7 @@ class EnumField<T> extends FieldWithValue<T> {
       bool? isUnique,
       String? jsonMapName,
       required Map<int, T> valuesMap})
-      : assert(valuesMap.keys.length > 0, 'Map must have entries'),
+      : assert(valuesMap.keys.isNotEmpty, 'Map must have entries'),
         super(
           columnName,
           notNull: notNull,
@@ -32,24 +32,26 @@ class EnumField<T> extends FieldWithValue<T> {
           jsonMapName: jsonMapName,
           jsonMapType: int,
         ) {
-    this._valuesMap = _BiMap<int, T>()..addAll(valuesMap);
+    _valuesMap = _BiMap<int, T>()..addAll(valuesMap);
   }
 
   late _BiMap<int, T> _valuesMap;
 
-  T? value;
+  @override
   Type get valueType => int;
 
   /// Get the field value in db storable tyle.
+  @override
   get dbValue => _valuesMap._inverse[value];
 
   /// Set the field value in db storable tyle.
+  @override
   set dbValue(dynamic dbValue) => value = _valuesMap[dbValue];
 }
 
 class _BiMap<K, V> implements Map<K, V> {
-  Map<K, V> _map = {};
-  Map<V, K> _inverse = {};
+  final Map<K, V> _map = {};
+  final Map<V, K> _inverse = {};
   @override
   V? operator [](Object? key) {
     return _map[key];
@@ -69,7 +71,9 @@ class _BiMap<K, V> implements Map<K, V> {
 
   @override
   void addEntries(Iterable<MapEntry<K, V>> newEntries) {
-    for (var e in newEntries) this[e.key] = e.value;
+    for (var e in newEntries) {
+      this[e.key] = e.value;
+    }
   }
 
   @override

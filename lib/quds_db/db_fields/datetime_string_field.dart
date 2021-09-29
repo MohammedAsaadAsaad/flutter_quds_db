@@ -21,10 +21,10 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
             jsonMapType: DateTime);
 
   /// Get db order statement to order from older to newer dates
-  FieldOrder get earlierOrder => this.ascOrder;
+  FieldOrder get earlierOrder => ascOrder;
 
   /// Get db order statement to order from newer to older dates
-  FieldOrder get laterOrder => this.descOrder;
+  FieldOrder get laterOrder => descOrder;
 
   /// Get db statement to check if this value more than another date,
   ///
@@ -80,14 +80,14 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
   ConditionQuery between(dynamic min, dynamic max) {
     DbFunctions.assertDateTimeStringsValues([min, max]);
     var q = ConditionQuery();
-    String qString = '(${this.buildQuery()} BETWEEN ';
+    String qString = '(${buildQuery()} BETWEEN ';
     qString += (min is DateTimeStringField) ? min.buildQuery() : '?';
     qString += ' AND ';
     qString += (max is DateTimeStringField) ? max.buildQuery() : '?';
     qString += ')';
     q.queryBuilder = () => qString;
     q.parametersBuilder = () => [
-          ...this.getParameters(),
+          ...getParameters(),
           if (min is NumField)
             ...min.getParameters()
           else
@@ -150,25 +150,25 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
   IntField _componentAsInteger(String format) {
     var result = IntField();
     result.queryBuilder =
-        () => "CAST(STRFTIME('%$format', ${this.buildQuery()}) AS INTEGER)";
-    result.parametersBuilder = () => [...this.getParameters()];
+        () => "CAST(STRFTIME('%$format', ${buildQuery()}) AS INTEGER)";
+    result.parametersBuilder = () => [...getParameters()];
     return result;
   }
 
   StringField _componentAsString(String format) {
     var result = StringField();
-    result.queryBuilder = () => "STRFTIME('%$format', ${this.buildQuery()})";
-    result.parametersBuilder = () => [...this.getParameters()];
+    result.queryBuilder = () => "STRFTIME('%$format', ${buildQuery()})";
+    result.parametersBuilder = () => [...getParameters()];
     return result;
   }
 
   /// Get db statement to check weather this field has same day and month parts of another [DateTime] object.
   ConditionQuery isSameDayAndMonth(DateTime d) {
-    return this.day.equals(d.day) & this.month.equals(d.month);
+    return day.equals(d.day) & month.equals(d.month);
   }
 
   @override
-  get dbValue => value == null ? null : value.toString();
+  get dbValue => value?.toString();
 
   @override
   set dbValue(dynamic v) {
@@ -186,8 +186,8 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
   /// Get the db date part of this value.
   DateTimeStringField get datePart {
     var result = DateTimeStringField();
-    result.queryBuilder = () => "DATE(${this.buildQuery()})";
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => "DATE(${buildQuery()})";
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -195,20 +195,19 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
   ConditionQuery isBirthday() {
     var now = DateTimeStringField.now;
     var result = ConditionQuery();
-    result.queryBuilder = () =>
-        (this.day.equals(now.day) & this.month.equals(now.month)).buildQuery();
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder =
+        () => (day.equals(now.day) & month.equals(now.month)).buildQuery();
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get a statement to check weather now has same date part of this value.
   ConditionQuery isSameDatePart(DateTime d) {
     var result = ConditionQuery();
-    result.queryBuilder = () => (this.day.equals(d.day) &
-            this.month.equals(d.month) &
-            this.year.equals(d.year))
-        .buildQuery();
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () =>
+        (day.equals(d.day) & month.equals(d.month) & year.equals(d.year))
+            .buildQuery();
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -216,16 +215,16 @@ class DateTimeStringField extends FieldWithValue<DateTime> {
   IntField get age {
     var result = IntField();
     result.queryBuilder = () =>
-        "(strftime('%Y', 'now') - strftime('%Y', ${this.buildQuery()})) - (strftime('%m-%d', 'now') < strftime('%m-%d', ${this.buildQuery()}))";
-    result.parametersBuilder = () => this.getParameters();
+        "(strftime('%Y', 'now') - strftime('%Y', ${buildQuery()})) - (strftime('%m-%d', 'now') < strftime('%m-%d', ${buildQuery()}))";
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get the db time part of this value.
   DateTimeStringField get timePart {
     var result = DateTimeStringField();
-    result.queryBuilder = () => "TIME(${this.buildQuery()})";
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => "TIME(${buildQuery()})";
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 

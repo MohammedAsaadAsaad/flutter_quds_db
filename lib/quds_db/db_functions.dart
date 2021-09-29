@@ -6,34 +6,42 @@ class DbFunctions {
   DbFunctions._();
 
   /// Assert each entry of [values] is not null.
-  static void assertNotNullValues(List values) => values.forEach((element) {
-        assert(element != null);
-      });
+  static void assertNotNullValues(List values) {
+    for (var v in values) {
+      assert(v != null);
+    }
+  }
 
   /// Assert each entry of [values] is [num] or [NumField].
   static void assertNumValues(List values) {
     assertNotNullValues(values);
-    for (var v in values) assert(v is num || v is NumField);
+    for (var v in values) {
+      assert(v is num || v is NumField);
+    }
   }
 
   /// Assert each entry of [values] is [String] or [StringField].
   static void assertStringValues(List values) {
     assertNotNullValues(values);
-    for (var v in values) assert(v is String || v is StringField);
+    for (var v in values) {
+      assert(v is String || v is StringField);
+    }
   }
 
   static String _buildListQuery(List values) {
     String result = '';
-    for (var v in values)
+    for (var v in values) {
       result += (v is FieldWithValue ? v.buildQuery() : '?') + ',';
+    }
     if (result.endsWith(',')) result = result.substring(0, result.length - 1);
     return result;
   }
 
   static List _buildParametersList(List values) {
     List result = [];
-    for (var v in values)
-      if (!(v is FieldWithValue)) result.add(DbHelper.getDbValue(v));
+    for (var v in values) {
+      if (v is! FieldWithValue) result.add(DbHelper.getDbValue(v));
+    }
     return result;
   }
 
@@ -116,12 +124,12 @@ class DbFunctions {
   /// Create sql statement with function `DISTINCT()` function applied.
   /// `DISTINCT()` is used to get rows without duplicates of [fields] values.
   static QueryPart distinct(List<FieldWithValue> fields) {
-    assert(fields.length > 0);
-    QueryPart result = new QueryPart._();
+    assert(fields.isNotEmpty);
+    QueryPart result = QueryPart._();
     String qText = 'DISTINCT ';
-    fields.forEach((element) {
+    for (var element in fields) {
       qText += element.buildQuery() + ',';
-    });
+    }
     qText = qText.substring(0, qText.length - 1);
     qText += ' ';
     result.queryBuilder = () => qText;

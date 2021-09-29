@@ -20,16 +20,16 @@ class StringField extends FieldWithValue<String> {
   /// Get string db value with `LOWER()` function applied.
   StringField toLowerCase() {
     var result = StringField();
-    result.queryBuilder = () => 'LOWER(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LOWER(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get string db value with `UPPER()` function applied.
   StringField toUpperCase() {
     var result = StringField();
-    result.queryBuilder = () => 'UPPER(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'UPPER(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -37,16 +37,16 @@ class StringField extends FieldWithValue<String> {
   StringField subString(int startIndex, int length) {
     var result = StringField();
     result.queryBuilder =
-        () => 'SUBSTR(${this.buildQuery()},$startIndex,$length)';
-    result.parametersBuilder = () => this.getParameters();
+        () => 'SUBSTR(${buildQuery()},$startIndex,$length)';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get a db int field with first character unicode.
   IntField unicodeOfFirstCharacter() {
     var result = IntField();
-    result.queryBuilder = () => 'UNICODE(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'UNICODE(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -60,9 +60,9 @@ class StringField extends FieldWithValue<String> {
 
     var result = StringField();
     result.queryBuilder = () => replacement is StringField
-        ? 'REPLACE(${this.buildQuery()},?,${replacement.buildQuery()})'
-        : 'REPLACE(${this.buildQuery()},?,?)';
-    result.parametersBuilder = () => this.getParameters()
+        ? 'REPLACE(${buildQuery()},?,${replacement.buildQuery()})'
+        : 'REPLACE(${buildQuery()},?,?)';
+    result.parametersBuilder = () => getParameters()
       ..addAll([pattern, if (replacement is String) replacement]);
     return result;
   }
@@ -74,20 +74,20 @@ class StringField extends FieldWithValue<String> {
 
     var result = IntField();
     result.queryBuilder = () => str is StringField
-        ? 'INSTR(${this.buildQuery()},${str.buildQuery()})'
-        : 'INSTR(${this.buildQuery()},?)';
+        ? 'INSTR(${buildQuery()},${str.buildQuery()})'
+        : 'INSTR(${buildQuery()},?)';
     result.parametersBuilder =
-        () => this.getParameters()..addAll([if (str is String) str]);
+        () => getParameters()..addAll([if (str is String) str]);
     return result;
   }
 
   StringField _buildTrimFunction(String trimName, String? ch) {
     var result = StringField();
     result.queryBuilder = () => (ch != null && ch.isNotEmpty)
-        ? '$trimName(${this.buildQuery()},?)'
-        : '$trimName(${this.buildQuery()})';
-    result.parametersBuilder = () =>
-        this.getParameters()..addAll([if ((ch != null && ch.isNotEmpty)) ch]);
+        ? '$trimName(${buildQuery()},?)'
+        : '$trimName(${buildQuery()})';
+    result.parametersBuilder =
+        () => getParameters()..addAll([if ((ch != null && ch.isNotEmpty)) ch]);
     return result;
   }
 
@@ -103,8 +103,8 @@ class StringField extends FieldWithValue<String> {
   /// Get db int field with the length of this string content.
   IntField get length {
     var result = IntField();
-    result.queryBuilder = () => 'LENGTH(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LENGTH(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -115,10 +115,10 @@ class StringField extends FieldWithValue<String> {
 
     var result = StringField();
     result.queryBuilder = () =>
-        '(${this.buildQuery()} || ' +
+        '(${buildQuery()} || ' +
         (other is StringField ? other.buildQuery() : '?') +
         ')';
-    result.parametersBuilder = () => this.getParameters()
+    result.parametersBuilder = () => getParameters()
       ..addAll(
           [if (other is StringField) ...(other.getParameters()) else other]);
 
@@ -150,16 +150,16 @@ class StringField extends FieldWithValue<String> {
   /// Get sql statement to order this field by its values lengths `descending`.
   FieldOrder get longerOrder {
     FieldOrder result = FieldOrder();
-    result.queryBuilder = () => 'LENGTH(' + this.buildQuery() + ') DESC';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LENGTH(' + buildQuery() + ') DESC';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get sql statement to order this field by its values lengths `ascending`.
   FieldOrder get shorterOrder {
     FieldOrder result = FieldOrder();
-    result.queryBuilder = () => 'LENGTH(' + this.buildQuery() + ') ASC';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'LENGTH(' + buildQuery() + ') ASC';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 }

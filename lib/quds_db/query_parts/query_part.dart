@@ -44,16 +44,16 @@ class QueryPart<T> {
   /// |ahmed|12|
   QueryPart asNamed(String name) {
     var result = QueryPart._();
-    result.queryBuilder = () => this.buildQuery() + ' AS \'$name\'';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => buildQuery() + ' AS \'$name\'';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   /// Get the db type of this query part using `TYPEOF()` function.
   StringField typeof() {
     StringField result = StringField();
-    result.queryBuilder = () => 'TYPEOF(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'TYPEOF(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 }

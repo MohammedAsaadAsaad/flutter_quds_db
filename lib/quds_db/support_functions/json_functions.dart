@@ -3,7 +3,7 @@ part of 'support_functions.dart';
 void _addJsonFunctions(Database db) {
   db.createFunction(
       functionName: 'json_array_length',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as String?;
         if (arg == null) return 0;
@@ -13,7 +13,7 @@ void _addJsonFunctions(Database db) {
 
   db.createFunction(
       functionName: 'json_array_remove',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var list = s[0] as String?;
         var index = s[1] as int?;
@@ -27,7 +27,7 @@ void _addJsonFunctions(Database db) {
 
   db.createFunction(
       functionName: 'json_array_insert',
-      argumentCount: AllowedArgumentCount(3),
+      argumentCount: const AllowedArgumentCount(3),
       function: (s) {
         var list = s[0] as String?;
         var index = s[1] as int?;
@@ -42,7 +42,7 @@ void _addJsonFunctions(Database db) {
 
   db.createFunction(
       functionName: 'json_array_add',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var list = s[0] as String?;
         var entry = s[1];
@@ -56,7 +56,7 @@ void _addJsonFunctions(Database db) {
 
   db.createFunction(
       functionName: 'contains_key',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var js = s[0] as String?;
         var arg = s[1] as String?;
@@ -67,7 +67,7 @@ void _addJsonFunctions(Database db) {
 
   db.createFunction(
       functionName: 'key_equals',
-      argumentCount: AllowedArgumentCount(3),
+      argumentCount: const AllowedArgumentCount(3),
       function: (s) {
         var js = s[0] as String?;
         var key = s[1] as String?;

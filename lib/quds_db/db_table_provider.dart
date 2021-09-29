@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 part of '../quds_db.dart';
 
 /// Represents a table in db with CRUD and other helping functions.
@@ -66,11 +68,9 @@ abstract class DbTableProvider<T extends DbModel> {
   }
 
   Future<bool> _checkEachColumn(dynamic db) async {
-    var tableInfo;
+    var tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
 
-    tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
-
-    var foundColumns = new Map<String, String>();
+    var foundColumns = <String, String>{};
     tableInfo.forEach((m) {
       var v = m.values.toList();
       foundColumns[v[1].toString().toLowerCase()] = v[2];
@@ -96,7 +96,7 @@ abstract class DbTableProvider<T extends DbModel> {
 
       int result = 0;
       var db = await _initializeDB();
-      var map = new Map<String, dynamic>();
+      var map = <String, dynamic>{};
       entry.creationTime.value = DateTime.now();
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
@@ -112,13 +112,13 @@ abstract class DbTableProvider<T extends DbModel> {
 
   /// Insert a collection of [entries] to this table.
   Future<void> insertCollection(List<T> entries) async {
-    if (entries.length == 0) return;
+    if (entries.isEmpty) return;
     try {
       var db = await _initializeDB();
       var batch = db.batch();
       for (var entry in entries) {
         await entry.beforeSave(true);
-        var map = new Map<String, dynamic>();
+        var map = <String, dynamic>{};
         entry.creationTime.value = DateTime.now();
         entry.modificationTime.value = DateTime.now();
         _setEntryToMap(entry, map);
@@ -144,7 +144,7 @@ abstract class DbTableProvider<T extends DbModel> {
       var batch = db.batch();
       for (var entry in entries) {
         await entry.beforeSave(true);
-        var map = new Map<String, dynamic>();
+        var map = <String, dynamic>{};
         entry.modificationTime.value = DateTime.now();
         _setEntryToMap(entry, map);
         batch.update(tableName, map,
@@ -170,7 +170,7 @@ abstract class DbTableProvider<T extends DbModel> {
       var batch = db.batch();
       for (var entry in entries) {
         await entry.beforeSave(true);
-        var map = new Map<String, dynamic>();
+        var map = <String, dynamic>{};
         entry.modificationTime.value = DateTime.now();
         _setEntryToMap(entry, map);
         batch.update(tableName, map,
@@ -230,7 +230,7 @@ abstract class DbTableProvider<T extends DbModel> {
 
   /// Insert a collection of [entries] using a transaction.
   Future<bool> insertCollectionInTransaction(List<T> entries) async {
-    if (entries.length == 0) return true;
+    if (entries.isEmpty) return true;
     try {
       await insertCollection(entries);
       return true;
@@ -246,7 +246,7 @@ abstract class DbTableProvider<T extends DbModel> {
     try {
       await entry.beforeSave(false);
       var db = await _initializeDB();
-      var map = new Map<String, dynamic>();
+      var map = <String, dynamic>{};
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
       await db.update(tableName, map, where: "$idColumnName=${entry.id.value}");
@@ -263,7 +263,7 @@ abstract class DbTableProvider<T extends DbModel> {
     try {
       await entry.beforeSave(false);
       var db = await _initializeDB();
-      var map = new Map<String, dynamic>();
+      var map = <String, dynamic>{};
       entry.modificationTime.value = DateTime.now();
       _setEntryToMap(entry, map);
       map.remove(idColumnName);
@@ -280,19 +280,21 @@ abstract class DbTableProvider<T extends DbModel> {
 
   void _setEntryToMap(T entry, Map map) {
     var fields = entry.getAllFields();
-    for (var f in fields) map[f!.columnName] = f.dbValue;
+    for (var f in fields) {
+      map[f!.columnName] = f.dbValue;
+    }
   }
 
   final T Function() _factoryOfT;
 
   /// Create an instance of DbTableProvider
   DbTableProvider(this._factoryOfT, {String? specialDbFile}) {
-    this._specialDbFile = specialDbFile;
+    _specialDbFile = specialDbFile;
   }
   T _createInstance() {
     T result = _factoryOfT();
     result.getAllFields().forEach((e) {
-      e!._tableName = this.tableName;
+      e!._tableName = tableName;
     });
     return result;
   }
@@ -335,14 +337,14 @@ abstract class DbTableProvider<T extends DbModel> {
   /// Get an entry by its id as key.
   Future<T?> loadEntryById(int id) async {
     var result = (await select(where: (m) => m.id.equals(id), limit: 1));
-    return result.length > 0 ? result.first : null;
+    return result.isNotEmpty ? result.first : null;
   }
 
   /// Get an entry by its server id as key.
   Future<T?> loadEntryByServerId(int serverId) async {
     var result =
         (await select(where: (m) => m.serverId.equals(serverId), limit: 1));
-    return result.length > 0 ? result.first : null;
+    return result.isNotEmpty ? result.first : null;
   }
 
   /// Count the entries of this table with [where] if required.
@@ -382,7 +384,7 @@ abstract class DbTableProvider<T extends DbModel> {
   }
 
   bool _processing = false;
-  List<Function()> _watchers = [];
+  final List<Function()> _watchers = [];
 
   /// Set this provider as processing some operation.
   @protected
@@ -397,7 +399,9 @@ abstract class DbTableProvider<T extends DbModel> {
   bool get isProcessing => _processing;
 
   void _callWatchers() {
-    for (var w in _watchers) w.call();
+    for (var w in _watchers) {
+      w.call();
+    }
   }
 
   /// Add a listener that be called when some change occured.
@@ -546,14 +550,14 @@ abstract class DbTableProvider<T extends DbModel> {
     List queryArgs = [];
     var queriesResults = queries == null ? null : queries(a, b);
 
-    if (queriesResults == null || queriesResults.length == 0)
+    if (queriesResults == null || queriesResults.isEmpty) {
       queryString = '*';
-    else {
-      queriesResults.forEach((element) {
+    } else {
+      for (var element in queriesResults) {
         var q = element.buildQuery();
         queryString += q + ',';
         queryArgs.addAll(element.getParameters());
-      });
+      }
 
       queryString = queryString.substring(0, queryString.length - 1);
     }
@@ -591,9 +595,9 @@ abstract class DbTableProvider<T extends DbModel> {
           .replaceAll('[', '')
           .replaceAll(']', '');
 
-      goupByQueries.forEach((element) {
+      for (var element in goupByQueries) {
         queryArgs.addAll(element.getParameters());
-      });
+      }
 
       queryString += ' GROUP BY $groupByText';
       if (having != null) {
@@ -613,18 +617,16 @@ abstract class DbTableProvider<T extends DbModel> {
           .replaceAll('[', '')
           .replaceAll(']', '');
 
-      orderQueries.forEach((element) {
+      for (var element in orderQueries) {
         queryArgs.addAll(element.getParameters());
-      });
+      }
     }
     if (orderByText != null) queryString += ' ORDER BY $orderByText';
 
     if (limit != null) queryString += ' LIMIT $limit';
     if (offset != null) queryString += ' OFFSET $offset';
     var db = await _initializeDB();
-    var results;
-
-    results = await (db).rawQuery(queryString, queryArgs);
+    var results = await (db).rawQuery(queryString, queryArgs);
 
     var r = results.toList();
     return r;
@@ -654,8 +656,11 @@ abstract class DbTableProvider<T extends DbModel> {
         );
         return result;
       }
-    } else
-      for (var entry in await select(where: where)) await deleteEntry(entry);
+    } else {
+      for (var entry in await select(where: where)) {
+        await deleteEntry(entry);
+      }
+    }
   }
 
   /// Get first row first field value
@@ -671,7 +676,7 @@ abstract class DbTableProvider<T extends DbModel> {
 
     if (result != null) {
       if (result is List) {
-        if (result.length > 0) if (result[0] != null) return result[0].row[0];
+        if (result.isNotEmpty) if (result[0] != null) return result[0].row[0];
       }
     }
     return null;
@@ -685,7 +690,7 @@ abstract class DbTableProvider<T extends DbModel> {
       List<FieldWithValue> Function(T model)? desiredFields}) async {
     var result = (await select(
         where: where, orderBy: orderBy, limit: 1, offset: offset));
-    return result.length > 0 ? result.first : null;
+    return result.isNotEmpty ? result.first : null;
   }
 
   /// Get first entry matching [where].
@@ -695,10 +700,10 @@ abstract class DbTableProvider<T extends DbModel> {
       List<FieldWithValue> Function(T model)? desiredFields}) async {
     var result = (await select(
         where: where, orderBy: orderBy, limit: 1, offset: offset));
-    return result.length > 0 ? result.first : null;
+    return result.isNotEmpty ? result.first : null;
   }
 
-  List<Function(EntryChangeType changeType, T entry)> _entryListners = [];
+  final List<Function(EntryChangeType changeType, T entry)> _entryListners = [];
 
   /// Add a listener that be called when some [EntryChangeType] occured.
   void addEntryChangeListner(
@@ -710,6 +715,9 @@ abstract class DbTableProvider<T extends DbModel> {
           Function(EntryChangeType changeType, T entry) lisnter) =>
       _entryListners.remove(lisnter);
 
-  void _fireChangeListners(EntryChangeType type, T entry) =>
-      _entryListners.forEach((element) => element.call(type, entry));
+  void _fireChangeListners(EntryChangeType type, T entry) {
+    for (var listner in _entryListners) {
+      listner.call(type, entry);
+    }
+  }
 }

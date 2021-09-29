@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -13,7 +15,7 @@ import 'package:synchronized/synchronized.dart';
 
 import 'database_tracker.dart';
 
-final _debug = false; // devWarning(true); // false
+const _debug = false; // devWarning(true); // false
 // final _useIsolate = true; // devWarning(true); // true the default!
 
 String _prefix = '[sqflite]';

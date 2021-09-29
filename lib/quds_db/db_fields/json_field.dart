@@ -35,29 +35,29 @@ class ListField extends _JsonField<List> {
 
   IntField get length {
     IntField result = IntField();
-    result.queryBuilder = () => 'json_array_length(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'json_array_length(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
   ListField removeAt(int index) {
     ListField result = ListField();
-    result.queryBuilder = () => 'json_array_remove(${this.buildQuery()},?)';
-    result.parametersBuilder = () => [...this.getParameters(), index];
+    result.queryBuilder = () => 'json_array_remove(${buildQuery()},?)';
+    result.parametersBuilder = () => [...getParameters(), index];
     return result;
   }
 
   ListField insertAt(int index, dynamic element) {
     ListField result = ListField();
-    result.queryBuilder = () => 'json_array_insert(${this.buildQuery()},?,?)';
-    result.parametersBuilder = () => [...this.getParameters(), index, element];
+    result.queryBuilder = () => 'json_array_insert(${buildQuery()},?,?)';
+    result.parametersBuilder = () => [...getParameters(), index, element];
     return result;
   }
 
   ListField add(dynamic element) {
     ListField result = ListField();
-    result.queryBuilder = () => 'json_array_add(${this.buildQuery()},?)';
-    result.parametersBuilder = () => [...this.getParameters(), element];
+    result.queryBuilder = () => 'json_array_add(${buildQuery()},?)';
+    result.parametersBuilder = () => [...getParameters(), element];
     return result;
   }
 }
@@ -79,15 +79,15 @@ class JsonField extends _JsonField<Map> {
 
   BoolField containsKey(String key) {
     BoolField result = BoolField();
-    result.queryBuilder = () => 'contains_key(${this.buildQuery()},?)';
-    result.parametersBuilder = () => [...this.getParameters(), key];
+    result.queryBuilder = () => 'contains_key(${buildQuery()},?)';
+    result.parametersBuilder = () => [...getParameters(), key];
     return result;
   }
 
   BoolField keyEquals(String key, dynamic value) {
     BoolField result = BoolField();
-    result.queryBuilder = () => 'key_equals(${this.buildQuery()},?,?)';
-    result.parametersBuilder = () => [...this.getParameters(), key, value];
+    result.queryBuilder = () => 'key_equals(${buildQuery()},?,?)';
+    result.parametersBuilder = () => [...getParameters(), key, value];
     return result;
   }
 }

@@ -46,7 +46,7 @@ abstract class DbModel {
   /// Get a list of all fields of this model with pre-created fields.
   List<FieldWithValue?> getAllFields() {
     var list = getFields();
-    return [id, serverId, creationTime, modificationTime]..addAll(list ?? []);
+    return [id, serverId, creationTime, modificationTime, ...?list];
   }
 
   /// Copy values from [other] db model fields to this fields.
@@ -56,28 +56,35 @@ abstract class DbModel {
   /// [fullCopy] Copy values with (id, serverId, creationTime, modificationTime).
   void copyValuesFrom(DbModel other,
       {List<FieldWithValue>? fieldsToCopy, bool fullCopy = false}) {
-    assert(this.runtimeType == other.runtimeType);
+    assert(runtimeType == other.runtimeType);
 
-    var getCorrepondingField = (String name) {
-      for (var f in this.getAllFields())
-        if (f != null) if (f.columnName!.trim().toLowerCase() ==
-            name.trim().toLowerCase()) return f;
+    FieldWithValue? Function(String name) getCorrepondingField;
+    getCorrepondingField = (String name) {
+      for (var f in getAllFields()) {
+        if (f != null) {
+          if (f.columnName!.trim().toLowerCase() == name.trim().toLowerCase()) {
+            return f;
+          }
+        }
+      }
     };
     List<FieldWithValue> fields = [];
-    if (fieldsToCopy != null)
+    if (fieldsToCopy != null) {
       for (var f in fieldsToCopy) {
         var corrField = getCorrepondingField(f.columnName!);
         if (corrField != null) fields.add(corrField);
       }
-    Map<String?, FieldWithValue?> fieldsMap = new Map();
-    (fullCopy
-            ? this.getAllFields()
-            : fieldsToCopy == null
-                ? this.getFields()!
-                : fields)
-        .forEach((e) => fieldsMap[e?.columnName] = e);
+    }
+    Map<String?, FieldWithValue?> fieldsMap = {};
+    for (var e in (fullCopy
+        ? getAllFields()
+        : fieldsToCopy == null
+            ? getFields()!
+            : fields)) {
+      fieldsMap[e?.columnName] = e;
+    }
 
-    Map<String, FieldWithValue> otherFieldsMap = new Map();
+    Map<String, FieldWithValue> otherFieldsMap = {};
     var otherFields = (fullCopy
         ? other.getAllFields()
         : fieldsToCopy == null
@@ -91,8 +98,9 @@ abstract class DbModel {
       var thisField = fieldsMap[k];
       var otherField = otherFieldsMap[k];
 
-      if (thisField != null && otherField != null)
+      if (thisField != null && otherField != null) {
         thisField.value = otherField.value;
+      }
     }
   }
 
@@ -104,24 +112,23 @@ abstract class DbModel {
   Iterable<FieldWithValue> differIn(DbModel other,
       {List<FieldWithValue>? fieldsToCheck, bool? allFields = true}) sync* {
     assert(allFields != null);
-    assert(this.runtimeType == other.runtimeType);
+    assert(runtimeType == other.runtimeType);
 
-    Map<String?, FieldWithValue> fieldsMap = new Map();
-    (allFields!
-            ? this.getAllFields()
-            : fieldsToCheck == null
-                ? this.getFields()!
-                : fieldsToCheck)
-        .forEach((e) => fieldsMap[e!.columnName] = e);
+    Map<String?, FieldWithValue> fieldsMap = {};
+    for (var e
+        in (allFields! ? getAllFields() : fieldsToCheck ?? getFields()!)) {
+      fieldsMap[e!.columnName] = e;
+    }
 
-    Map<String, FieldWithValue> otherFieldsMap = new Map();
-    (allFields
-            ? other.getAllFields()
-            : fieldsToCheck == null
-                ? other.getFields()!
-                : other._getNamedFields(
-                    fieldsToCheck.map((e) => e.columnName).toList()))
-        .forEach((e) => otherFieldsMap[e!.columnName!] = e);
+    Map<String, FieldWithValue> otherFieldsMap = {};
+    for (var e in (allFields
+        ? other.getAllFields()
+        : fieldsToCheck == null
+            ? other.getFields()!
+            : other._getNamedFields(
+                fieldsToCheck.map((e) => e.columnName).toList()))) {
+      otherFieldsMap[e!.columnName!] = e;
+    }
 
 //compare values
     for (var k in fieldsMap.keys) {
@@ -142,8 +149,7 @@ abstract class DbModel {
   bool differ(DbModel other,
       {List<FieldWithValue>? fieldsToCheck, bool allFields = true}) {
     return differIn(other, fieldsToCheck: fieldsToCheck, allFields: allFields)
-            .length >
-        0;
+        .isNotEmpty;
   }
 
   /// Get this model fields with thier names.
@@ -154,17 +160,19 @@ abstract class DbModel {
   /// Set values of this model from json map.
   void fromMap(Map<String, dynamic> m) {
     var fields = getAllFields();
-    for (var f in fields)
+    for (var f in fields) {
       if (f?.jsonMapName != null) {
         if (m.containsKey(f?.jsonMapName)) {
           try {
             var v = DbHelper._getMapValue(m[f?.jsonMapName], f!.valueType);
             f.value = v;
           } catch (e) {
+            // ignore: avoid_print
             print(e);
           }
         }
       }
+    }
   }
 
   // Map<String, dynamic> toMap() {

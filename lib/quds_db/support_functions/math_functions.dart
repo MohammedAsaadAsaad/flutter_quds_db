@@ -3,7 +3,7 @@ part of 'support_functions.dart';
 void _addMathSupportFunctions(Database db) {
   db.createFunction(
       functionName: 'sin',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.sin(arg);
@@ -11,7 +11,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'cos',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.cos(arg);
@@ -19,7 +19,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'tan',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.tan(arg);
@@ -27,7 +27,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'degrees',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return arg * 180.0 / math.pi;
@@ -35,7 +35,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'radians',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return arg * math.pi / 180.0;
@@ -43,14 +43,14 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'pi',
-      argumentCount: AllowedArgumentCount(0),
+      argumentCount: const AllowedArgumentCount(0),
       function: (s) {
         return math.pi;
       });
 
   db.createFunction(
       functionName: 'exp',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.exp(arg);
@@ -58,7 +58,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'asin',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.asin(arg);
@@ -66,7 +66,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'acos',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.acos(arg);
@@ -74,7 +74,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'atan',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.atan(arg);
@@ -82,7 +82,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'atan2',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var arg1 = s[0] as num;
         var arg2 = s[1] as num;
@@ -91,7 +91,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'floor',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return arg.floor();
@@ -99,7 +99,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'ln',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.log(arg);
@@ -107,7 +107,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'log',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.log(arg) / math.ln10;
@@ -115,7 +115,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'log10',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.log(arg) / math.ln10;
@@ -123,7 +123,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'log2',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.log(arg) / math.ln2;
@@ -131,7 +131,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'log_b',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var b = s[0] as num;
         var arg = s[1] as num;
@@ -140,7 +140,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'pow',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var x = s[0] as num;
         var y = s[1] as num;
@@ -149,7 +149,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'power',
-      argumentCount: AllowedArgumentCount(2),
+      argumentCount: const AllowedArgumentCount(2),
       function: (s) {
         var x = s[0] as num;
         var y = s[1] as num;
@@ -158,7 +158,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'ceil',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return arg.ceil();
@@ -166,7 +166,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'ceiling',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return arg.ceil();
@@ -174,7 +174,7 @@ void _addMathSupportFunctions(Database db) {
 
   db.createFunction(
       functionName: 'sqrt',
-      argumentCount: AllowedArgumentCount(1),
+      argumentCount: const AllowedArgumentCount(1),
       function: (s) {
         var arg = s[0] as num;
         return math.sqrt(arg);

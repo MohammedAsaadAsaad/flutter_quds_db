@@ -83,13 +83,17 @@ class FieldWithValue<T> extends QueryPart<T> {
 
   ConditionQuery _buildInOrNotInCollection(List<T> collection, bool inC) {
     var result = ConditionQuery();
-    result.parametersBuilder = () => this.getParameters()..addAll(collection);
-    String resultQuery = this.buildQuery() + ' ${inC ? 'IN' : 'NOT IN'} (';
+    result.parametersBuilder = () => getParameters()..addAll(collection);
+    String resultQuery = buildQuery() + ' ${inC ? 'IN' : 'NOT IN'} (';
 
-    collection.forEach((element) => resultQuery += '?,');
+    // ignore: unused_local_variable
+    for (var e in collection) {
+      resultQuery += '?,';
+    }
 
-    if (resultQuery.endsWith(','))
+    if (resultQuery.endsWith(',')) {
       resultQuery = resultQuery.substring(0, resultQuery.length - 1);
+    }
     resultQuery += ')';
 
     result.queryBuilder = () => resultQuery;
@@ -125,7 +129,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   ConditionQuery get isNull {
     var result = ConditionQuery();
-    result.queryBuilder = () => '${this.buildQuery()} IS NULL';
+    result.queryBuilder = () => '${buildQuery()} IS NULL';
     result.parametersBuilder = () => [];
     return result;
   }
@@ -139,7 +143,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   ConditionQuery get isNotNull {
     var result = ConditionQuery();
-    result.queryBuilder = () => '${this.buildQuery()} IS NOT NULL';
+    result.queryBuilder = () => '${buildQuery()} IS NOT NULL';
     result.parametersBuilder = () => [];
     return result;
   }
@@ -153,7 +157,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   FieldOrder get ascOrder {
     var result = FieldOrder();
-    result.queryBuilder = () => this.buildQuery() + ' ASC';
+    result.queryBuilder = () => buildQuery() + ' ASC';
     return result;
   }
 
@@ -166,7 +170,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   FieldOrder get descOrder {
     var result = FieldOrder();
-    result.queryBuilder = () => this.buildQuery() + ' DESC';
+    result.queryBuilder = () => buildQuery() + ' DESC';
     return result;
   }
 
@@ -186,8 +190,8 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// Get an [IntField] with count of this field values.
   IntField count() {
     IntField result = IntField();
-    result.queryBuilder = () => 'COUNT(${this.buildQuery()})';
-    result.parametersBuilder = () => [...this.getParameters()];
+    result.queryBuilder = () => 'COUNT(${buildQuery()})';
+    result.parametersBuilder = () => [...getParameters()];
     return result;
   }
 

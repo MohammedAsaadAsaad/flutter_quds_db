@@ -43,12 +43,12 @@ class DoubleField extends NumField<double> {
     var result = DoubleField();
     result.queryBuilder = () =>
         '(' +
-        this.buildQuery() +
+        buildQuery() +
         ' $operation ' +
         DbHelper.buildQueryForOperand(other) +
         ')';
     result.parametersBuilder = () => [
-          ...this.getParameters(),
+          ...getParameters(),
           if (other is QueryPart)
             ...other.getParameters()
           else
@@ -60,8 +60,8 @@ class DoubleField extends NumField<double> {
   /// Get db double field with `ABS()` function applied.
   DoubleField abs() {
     var result = DoubleField();
-    result.queryBuilder = () => 'ABS(' + this.buildQuery() + ')';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'ABS(' + buildQuery() + ')';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 
@@ -69,8 +69,8 @@ class DoubleField extends NumField<double> {
   IntField toInt() {
     var result = IntField();
     result.queryBuilder =
-        () => 'CAST(ROUND(' + this.buildQuery() + ') AS INTEGER)';
-    result.parametersBuilder = () => this.getParameters();
+        () => 'CAST(ROUND(' + buildQuery() + ') AS INTEGER)';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 }

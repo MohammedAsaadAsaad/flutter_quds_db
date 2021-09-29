@@ -23,8 +23,8 @@ class BlobField extends FieldWithValue<Uint8List> {
   /// Get [StringField] with `HEX()` function
   StringField hex() {
     var result = StringField();
-    result.queryBuilder = () => 'HEX(${this.buildQuery()})';
-    result.parametersBuilder = () => this.getParameters();
+    result.queryBuilder = () => 'HEX(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
     return result;
   }
 }

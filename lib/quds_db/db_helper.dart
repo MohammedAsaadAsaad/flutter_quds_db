@@ -7,9 +7,9 @@ class DbHelper {
   /// To prevent creating instances of [DbHelper].
   DbHelper._();
 
-  static Map<String, List<Type>> _fieldType = const {
-    'TEXT': const [String, Map, List, Object],
-    'INTEGER': const [
+  static final Map<String, List<Type>> _fieldType = {
+    'TEXT': [String, Map, List, Object],
+    'INTEGER': [
       Color,
       DateTime,
       int,
@@ -22,15 +22,15 @@ class DbHelper {
       Uint64,
       Uint8
     ],
-    'BIT': const [
+    'BIT': [
       bool,
     ],
-    'REAL': const [
+    'REAL': [
       double,
       // Float,
     ],
-    'BLOB': const [Uint8List],
-    'NUMERIC': const [num]
+    'BLOB': [Uint8List],
+    'NUMERIC': [num]
   };
 
   /// Get the db field type name of dart native type.
@@ -46,7 +46,7 @@ class DbHelper {
   /// The main db path where all tables to be saved untill one is customized.
   static String? mainDbPath;
 
-  static Map<String, sqlite_api.Database> _createdTables = new Map();
+  static final Map<String, sqlite_api.Database> _createdTables = {};
 
   static bool _initialized = false;
   static Future<void> _initializeDb() async {
@@ -135,9 +135,7 @@ class DbHelper {
       case String:
         return value is String
             ? value
-            : value == null
-                ? null
-                : value.toString();
+            : value?.toString();
 
       case Color:
         return value is Color
@@ -175,10 +173,11 @@ class DbHelper {
   static getValueFromDbValue(Type type, dynamic dbValue) {
     if (type == bool) return dbValue == null ? null : dbValue == 1;
 
-    if (type == DateTime)
+    if (type == DateTime) {
       return dbValue == null
           ? null
           : DateTime.fromMillisecondsSinceEpoch(dbValue);
+    }
 
     if (type == Color) return dbValue == null ? null : Color(dbValue);
     if (type == Map) return dbValue == null ? null : json.decode(dbValue);
@@ -189,15 +188,17 @@ class DbHelper {
   /// Get db value of some dart native value.
   static getDbValue(dynamic value) {
     var type = value.runtimeType;
-    if (type == bool)
+    if (type == bool) {
       return value == null
           ? null
           : value
               ? 1
               : 0;
+    }
 
-    if (type == DateTime)
-      return value == null ? null : value.millisecondsSinceEpoch;
+    if (type == DateTime) {
+      return value?.millisecondsSinceEpoch;
+    }
 
     if (type == Color) return value == null ? null : (value as Color).value;
 

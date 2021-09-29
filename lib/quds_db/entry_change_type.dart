@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 part of '../quds_db.dart';
 
 /// Represents the change type in some table.

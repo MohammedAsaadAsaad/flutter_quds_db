@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:sqflite_common/sqlite_api.dart';
 import '../sqflite_ffi.dart';
 import '../src/method_call.dart';

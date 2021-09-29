@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:isolate';
 
 import '../sqflite_ffi.dart';
