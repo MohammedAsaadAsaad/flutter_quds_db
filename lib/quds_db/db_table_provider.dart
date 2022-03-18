@@ -50,12 +50,12 @@ abstract class DbTableProvider<T extends DbModel> {
     }
   }
 
-  Future<bool> _checkAndCreateTableIfNotExist(dynamic db) async {
+  Future<bool> _checkAndCreateTableIfNotExist(sqlite_api.Database db) async {
     try {
-      db.execute(_createStatement);
+      await db.execute(_createStatement);
       return true;
     } catch (e) {
-      if (kDebugMode) print('SqlException: $e');
+      print('SqlException: $e');
 
       return false;
     }
@@ -67,21 +67,21 @@ abstract class DbTableProvider<T extends DbModel> {
     db.execute('vacuum;');
   }
 
-  Future<bool> _checkEachColumn(dynamic db) async {
+  Future<bool> _checkEachColumn(sqlite_api.Database db) async {
     var tableInfo = await db.rawQuery('PRAGMA table_info($tableName)');
 
     var foundColumns = <String, String>{};
-    tableInfo.forEach((m) {
+    for (var m in tableInfo) {
       var v = m.values.toList();
-      foundColumns[v[1].toString().toLowerCase()] = v[2];
-    });
+      foundColumns[v[1].toString().toLowerCase()] = '${v[2]}';
+    }
 
     T tempEntry = _createInstance();
     var fields = tempEntry.getAllFields();
     for (var f in fields) {
       if (!foundColumns.containsKey(f!.columnName?.toLowerCase())) {
         //Missed key
-        db.execute('ALTER TABLE $tableName\n'
+        await db.execute('ALTER TABLE $tableName\n'
             'ADD ${f.columnDefinition}');
       }
     }
@@ -387,7 +387,6 @@ abstract class DbTableProvider<T extends DbModel> {
   final List<Function()> _watchers = [];
 
   /// Set this provider as processing some operation.
-  @protected
   set isProcessing(bool value) {
     if (value != _processing) {
       _processing = value;

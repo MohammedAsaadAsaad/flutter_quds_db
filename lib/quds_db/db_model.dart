@@ -15,14 +15,12 @@ abstract class DbModel {
   var serverId = IntField(columnName: 'serverId', jsonMapName: 'id');
 
   /// The creation time of this model, its value set once automatically when created in db.
-  var creationTime = DateTimeField(
-    columnName: 'creationTime',
-  );
+  var creationTime =
+      DateTimeField(columnName: 'creationTime', jsonMapName: 'created_at');
 
   /// The modification time of this model, its value set automatically when created or modified in db.
-  var modificationTime = DateTimeField(
-    columnName: 'modificationTime',
-  );
+  var modificationTime =
+      DateTimeField(columnName: 'modificationTime', jsonMapName: 'updated_at');
 
   /// Create an instance of [DbModel].
   DbModel();

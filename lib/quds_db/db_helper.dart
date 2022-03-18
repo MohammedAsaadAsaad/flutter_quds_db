@@ -51,12 +51,11 @@ class DbHelper {
   static bool _initialized = false;
   static Future<void> _initializeDb() async {
     if (_initialized) return;
-    WidgetsFlutterBinding.ensureInitialized();
     mainDbPath = (await path_provider.getApplicationSupportDirectory()).path +
         '/data.db';
     _initialized = true;
 
-    if (kDebugMode && !_donationDisplayed) {
+    if (!_donationDisplayed) {
       _donationDisplayed = true;
       log('_______________Quds Db________________');
       log('Hi great developer!');
@@ -133,9 +132,7 @@ class DbHelper {
                 ? null
                 : ['true', '1'].contains(value.toString().toLowerCase().trim());
       case String:
-        return value is String
-            ? value
-            : value?.toString();
+        return value is String ? value : value?.toString();
 
       case Color:
         return value is Color

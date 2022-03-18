@@ -41,3 +41,6 @@
 
 ## [0.0.5]
 * Add Support to the mathematics functions like sin, atan, pow ..etc
+
+## [0.0.5+1]
+* Fixed a bug in column definition

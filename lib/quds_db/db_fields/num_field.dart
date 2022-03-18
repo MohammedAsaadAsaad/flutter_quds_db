@@ -10,7 +10,7 @@ class NumField<T> extends FieldWithValue<T> {
       Type jsonMapType = num})
       : super(columnName,
             notNull: notNull,
-            isUnique: notNull,
+            isUnique: isUnique,
             jsonMapName: jsonMapName,
             jsonMapType: jsonMapType);
 
