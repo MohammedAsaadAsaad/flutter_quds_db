@@ -65,6 +65,7 @@ abstract class DbModel {
           }
         }
       }
+      return null;
     };
     List<FieldWithValue> fields = [];
     if (fieldsToCopy != null) {

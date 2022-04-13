@@ -154,6 +154,7 @@ class _BiMap<K, V> implements Map<K, V> {
   V? remove(Object? key) {
     var v = _map.remove(key);
     if (v != null) _inverse.remove(v);
+    return null;
   }
 
   @override

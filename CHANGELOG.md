@@ -44,3 +44,6 @@
 
 ## [0.0.5+1]
 * Fixed a bug in column definition
+
+## [0.0.5+3]
+* Removed ColorField

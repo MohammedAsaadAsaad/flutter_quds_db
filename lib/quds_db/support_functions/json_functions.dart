@@ -23,6 +23,7 @@ void _addJsonFunctions(Database db) {
           listJson.removeAt(index);
           return json.encode(listJson);
         }
+        return null;
       });
 
   db.createFunction(
@@ -38,6 +39,7 @@ void _addJsonFunctions(Database db) {
           listJson.insert(index, entry);
           return json.encode(listJson);
         }
+        return null;
       });
 
   db.createFunction(
@@ -52,6 +54,7 @@ void _addJsonFunctions(Database db) {
           listJson.add(entry);
           return json.encode(listJson);
         }
+        return null;
       });
 
   db.createFunction(

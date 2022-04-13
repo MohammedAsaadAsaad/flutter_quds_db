@@ -4,7 +4,7 @@ class Note extends DbModel {
   var title = StringField(columnName: 'title');
   var content = StringField(columnName: 'content');
   // var isImportant = BoolField(columnName: 'isImportant');
-  var color = ColorField(columnName: 'color');
+  // var color = ColorField(columnName: 'color');
   var importance = EnumField<Importance>(columnName: 'mmm', valuesMap: {
     1: Importance.normal,
     2: Importance.important,
@@ -17,7 +17,7 @@ class Note extends DbModel {
 
   @override
   List<FieldWithValue>? getFields() =>
-      [title, content, color, importance, jsonData, jsonArrayData];
+      [title, content, /*color,*/ importance, jsonData, jsonArrayData];
 }
 
 enum Importance { normal, important, veryImportant }
