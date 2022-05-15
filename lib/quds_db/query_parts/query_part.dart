@@ -44,7 +44,7 @@ class QueryPart<T> {
   /// |ahmed|12|
   QueryPart asNamed(String name) {
     var result = QueryPart._();
-    result.queryBuilder = () => buildQuery() + ' AS \'$name\'';
+    result.queryBuilder = () => '${buildQuery()} AS \'$name\'';
     result.parametersBuilder = () => getParameters();
     return result;
   }

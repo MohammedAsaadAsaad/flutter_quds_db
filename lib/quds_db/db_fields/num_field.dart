@@ -103,8 +103,8 @@ class NumField<T> extends FieldWithValue<T> {
   /// Get a db field with this value rounded to [digits] decimals.
   DoubleField round([int? digits]) {
     var result = DoubleField();
-    result.queryBuilder = () =>
-        'ROUND(' + buildQuery() + (digits == null ? ')' : ',$digits)');
+    result.queryBuilder =
+        () => 'ROUND(${buildQuery()}${digits == null ? ')' : ',$digits)'}';
     result.parametersBuilder = () => getParameters();
     return result;
   }

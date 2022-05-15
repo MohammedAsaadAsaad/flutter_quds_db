@@ -50,7 +50,7 @@ class FieldWithValue<T> extends QueryPart<T> {
     if (queryBuilder != null) return queryBuilder!();
     return (_tableName == null
             ? columnName
-            : _tableName! + '.' + columnName!) ??
+            : '${_tableName!}.${columnName!}') ??
         '';
   }
 
@@ -84,7 +84,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   ConditionQuery _buildInOrNotInCollection(List<T> collection, bool inC) {
     var result = ConditionQuery();
     result.parametersBuilder = () => getParameters()..addAll(collection);
-    String resultQuery = buildQuery() + ' ${inC ? 'IN' : 'NOT IN'} (';
+    String resultQuery = '${buildQuery()} ${inC ? 'IN' : 'NOT IN'} (';
 
     // ignore: unused_local_variable
     for (var e in collection) {
@@ -157,7 +157,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   FieldOrder get ascOrder {
     var result = FieldOrder();
-    result.queryBuilder = () => buildQuery() + ' ASC';
+    result.queryBuilder = () => '${buildQuery()} ASC';
     return result;
   }
 
@@ -170,7 +170,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   /// ```
   FieldOrder get descOrder {
     var result = FieldOrder();
-    result.queryBuilder = () => buildQuery() + ' DESC';
+    result.queryBuilder = () => '${buildQuery()} DESC';
     return result;
   }
 

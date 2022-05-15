@@ -10,7 +10,7 @@ class DbHelper {
   static final Map<String, List<Type>> _fieldType = {
     'TEXT': [String, Map, List, Object],
     'INTEGER': [
-      // Color,
+      Color,
       DateTime,
       int,
       Int32,
@@ -51,8 +51,8 @@ class DbHelper {
   static bool _initialized = false;
   static Future<void> _initializeDb() async {
     if (_initialized) return;
-    mainDbPath = (await path_provider.getApplicationSupportDirectory()).path +
-        '/data.db';
+    mainDbPath =
+        '${(await path_provider.getApplicationSupportDirectory()).path}/data.db';
     _initialized = true;
 
     if (!_donationDisplayed) {
@@ -75,7 +75,7 @@ class DbHelper {
             dbProvider._specialDbFile!.trim().isEmpty)
         ? DbHelper.mainDbPath!
         : dbProvider._specialDbFile!;
-    String mapKey = dbPath + '.' + dbProvider.tableName;
+    String mapKey = '$dbPath.${dbProvider.tableName}';
 
     if (map[mapKey] != null) return map[mapKey]!;
 
@@ -134,16 +134,16 @@ class DbHelper {
       case String:
         return value is String ? value : value?.toString();
 
-      // case Color:
-      //   return value is Color
-      //       ? value
-      //       : value == null
-      //           ? null
-      //           : value is int
-      //               ? Color(value)
-      //               : value is String
-      //                   ? Color(int.parse(value.toString()))
-      //                   : null;
+      case Color:
+        return value is Color
+            ? value
+            : value == null
+                ? null
+                : value is int
+                    ? Color(value)
+                    : value is String
+                        ? Color(int.parse(value.toString()))
+                        : null;
 
       case Map:
         return value is Map
@@ -176,7 +176,7 @@ class DbHelper {
           : DateTime.fromMillisecondsSinceEpoch(dbValue);
     }
 
-    // if (type == Color) return dbValue == null ? null : Color(dbValue);
+    if (type == Color) return dbValue == null ? null : Color(dbValue);
     if (type == Map) return dbValue == null ? null : json.decode(dbValue);
     if (type == List) return dbValue == null ? null : json.decode(dbValue);
     return dbValue;
@@ -197,7 +197,7 @@ class DbHelper {
       return value?.millisecondsSinceEpoch;
     }
 
-    // if (type == Color) return value == null ? null : (value as Color).value;
+    if (type == Color) return value == null ? null : (value as Color).value;
 
     if (value is Map) return json.encode(value);
     if (value is List) return json.encode(value);
