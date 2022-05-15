@@ -96,9 +96,9 @@ class _MyHomePageState extends State<MyHomePage> {
           await notesProvider.deleteEntry(n);
         },
       ),
-      // leading: CircleAvatar(
-      //   backgroundColor: n.color.value,
-      // ),
+      leading: CircleAvatar(
+        backgroundColor: n.color.value,
+      ),
     );
   }
 
@@ -110,12 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ..title.value = 'New note'
           ..content.value = 'Note content, describe your self'
           ..importance.value = (Importance.values.toList()..shuffle()).first
-      // ..color.value = ([
-      //   const Color(0xffff0000),
-      //   const Color(0xff00ff00),
-      //   const Color(0xff0000ff)
-      // ]..shuffle())
-      //     .first
+      ..color.value = ([
+        const Color(0xffff0000),
+        const Color(0xff00ff00),
+        const Color(0xff0000ff)
+      ]..shuffle())
+          .first
     ];
 
     await notesProvider.insertCollection(notes);

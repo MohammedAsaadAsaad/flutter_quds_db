@@ -36,8 +36,7 @@ class StringField extends FieldWithValue<String> {
   /// Get string db value with `SUBSTR()` function applied.
   StringField subString(int startIndex, int length) {
     var result = StringField();
-    result.queryBuilder =
-        () => 'SUBSTR(${buildQuery()},$startIndex,$length)';
+    result.queryBuilder = () => 'SUBSTR(${buildQuery()},$startIndex,$length)';
     result.parametersBuilder = () => getParameters();
     return result;
   }
@@ -115,9 +114,7 @@ class StringField extends FieldWithValue<String> {
 
     var result = StringField();
     result.queryBuilder = () =>
-        '(${buildQuery()} || ' +
-        (other is StringField ? other.buildQuery() : '?') +
-        ')';
+        '(${buildQuery()} || ${other is StringField ? other.buildQuery() : '?'})';
     result.parametersBuilder = () => getParameters()
       ..addAll(
           [if (other is StringField) ...(other.getParameters()) else other]);
@@ -150,7 +147,7 @@ class StringField extends FieldWithValue<String> {
   /// Get sql statement to order this field by its values lengths `descending`.
   FieldOrder get longerOrder {
     FieldOrder result = FieldOrder();
-    result.queryBuilder = () => 'LENGTH(' + buildQuery() + ') DESC';
+    result.queryBuilder = () => 'LENGTH(${buildQuery()}) DESC';
     result.parametersBuilder = () => getParameters();
     return result;
   }
@@ -158,7 +155,7 @@ class StringField extends FieldWithValue<String> {
   /// Get sql statement to order this field by its values lengths `ascending`.
   FieldOrder get shorterOrder {
     FieldOrder result = FieldOrder();
-    result.queryBuilder = () => 'LENGTH(' + buildQuery() + ') ASC';
+    result.queryBuilder = () => 'LENGTH(${buildQuery()}) ASC';
     result.parametersBuilder = () => getParameters();
     return result;
   }

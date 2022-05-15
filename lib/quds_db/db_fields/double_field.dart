@@ -42,11 +42,7 @@ class DoubleField extends NumField<double> {
   DoubleField _getMathOperationQuery(String operation, dynamic other) {
     var result = DoubleField();
     result.queryBuilder = () =>
-        '(' +
-        buildQuery() +
-        ' $operation ' +
-        DbHelper.buildQueryForOperand(other) +
-        ')';
+        '(${buildQuery()} $operation ${DbHelper.buildQueryForOperand(other)})';
     result.parametersBuilder = () => [
           ...getParameters(),
           if (other is QueryPart)
@@ -60,7 +56,7 @@ class DoubleField extends NumField<double> {
   /// Get db double field with `ABS()` function applied.
   DoubleField abs() {
     var result = DoubleField();
-    result.queryBuilder = () => 'ABS(' + buildQuery() + ')';
+    result.queryBuilder = () => 'ABS(${buildQuery()})';
     result.parametersBuilder = () => getParameters();
     return result;
   }
@@ -68,8 +64,7 @@ class DoubleField extends NumField<double> {
   /// Get db int field represents this value after rounding.
   IntField toInt() {
     var result = IntField();
-    result.queryBuilder =
-        () => 'CAST(ROUND(' + buildQuery() + ') AS INTEGER)';
+    result.queryBuilder = () => 'CAST(ROUND(${buildQuery()}) AS INTEGER)';
     result.parametersBuilder = () => getParameters();
     return result;
   }

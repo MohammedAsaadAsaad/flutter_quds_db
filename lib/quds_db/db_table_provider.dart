@@ -15,10 +15,10 @@ abstract class DbTableProvider<T extends DbModel> {
   String get _createStatement {
     T tempEntry = _createInstance();
 
-    String cS = 'CREATE TABLE IF NOT EXISTS ' + tableName;
+    String cS = 'CREATE TABLE IF NOT EXISTS $tableName';
     cS += '(';
     tempEntry.getAllFields().forEach((e) {
-      cS += e!.columnDefinition + ',';
+      cS += '${e!.columnDefinition},';
     });
     //Remove last ','
     cS = cS.substring(0, cS.length - 1);
@@ -554,7 +554,7 @@ abstract class DbTableProvider<T extends DbModel> {
     } else {
       for (var element in queriesResults) {
         var q = element.buildQuery();
-        queryString += q + ',';
+        queryString += '$q,';
         queryArgs.addAll(element.getParameters());
       }
 
@@ -601,7 +601,7 @@ abstract class DbTableProvider<T extends DbModel> {
       queryString += ' GROUP BY $groupByText';
       if (having != null) {
         var havingQuery = having(a);
-        queryString += ' HAVING ' + havingQuery.buildQuery();
+        queryString += ' HAVING ${havingQuery.buildQuery()}';
         queryArgs.addAll(havingQuery.getParameters());
       }
     }

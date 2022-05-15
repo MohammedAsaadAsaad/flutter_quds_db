@@ -71,11 +71,7 @@ class IntField extends NumField<int> {
   IntField _getMathOperationQuery(String operation, dynamic other) {
     var result = IntField();
     result.queryBuilder = () =>
-        '(' +
-        buildQuery() +
-        ' $operation ' +
-        DbHelper.buildQueryForOperand(other) +
-        ')';
+        '(${buildQuery()} $operation ${DbHelper.buildQueryForOperand(other)})';
     result.parametersBuilder = () => [
           ...getParameters(),
           if (other is QueryPart)
@@ -95,7 +91,7 @@ class IntField extends NumField<int> {
   /// Get new [IntField] object with db `ABS()` function applied.
   IntField abs() {
     var result = IntField();
-    result.queryBuilder = () => 'ABS(' + buildQuery() + ')';
+    result.queryBuilder = () => 'ABS(${buildQuery()})';
     result.parametersBuilder = () => getParameters();
     return result;
   }
@@ -103,7 +99,7 @@ class IntField extends NumField<int> {
   /// Get new [IntField] object with db `AVG()` function applied.
   IntField avg() {
     var result = IntField();
-    result.queryBuilder = () => 'AVG(' + buildQuery() + ')';
+    result.queryBuilder = () => 'AVG(${buildQuery()})';
     result.parametersBuilder = () => getParameters();
     return result;
   }
@@ -111,7 +107,7 @@ class IntField extends NumField<int> {
   /// Get new [DoubleField] object with this field value.
   DoubleField toDouble() {
     var result = DoubleField();
-    result.queryBuilder = () => 'CAST(' + buildQuery() + ' AS REAL)';
+    result.queryBuilder = () => 'CAST(${buildQuery()} AS REAL)';
     result.parametersBuilder = () => getParameters();
     return result;
   }

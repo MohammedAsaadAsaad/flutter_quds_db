@@ -31,7 +31,7 @@ class DbFunctions {
   static String _buildListQuery(List values) {
     String result = '';
     for (var v in values) {
-      result += (v is FieldWithValue ? v.buildQuery() : '?') + ',';
+      result += '${v is FieldWithValue ? v.buildQuery() : '?'},';
     }
     if (result.endsWith(',')) result = result.substring(0, result.length - 1);
     return result;
@@ -51,8 +51,7 @@ class DbFunctions {
   ) {
     assertNumValues(values);
     DoubleField result = DoubleField();
-    result.queryBuilder =
-        () => '$functionName(' + _buildListQuery(values) + ')';
+    result.queryBuilder = () => '$functionName(${_buildListQuery(values)})';
     result.parametersBuilder = () => _buildParametersList(values);
     return result;
   }
@@ -63,8 +62,7 @@ class DbFunctions {
   ) {
     assertStringValues(values);
     StringField result = StringField();
-    result.queryBuilder =
-        () => '$functionName(' + _buildListQuery(values) + ')';
+    result.queryBuilder = () => '$functionName(${_buildListQuery(values)})';
     result.parametersBuilder = () => _buildParametersList(values);
     return result;
   }
@@ -128,7 +126,7 @@ class DbFunctions {
     QueryPart result = QueryPart._();
     String qText = 'DISTINCT ';
     for (var element in fields) {
-      qText += element.buildQuery() + ',';
+      qText += '${element.buildQuery()},';
     }
     qText = qText.substring(0, qText.length - 1);
     qText += ' ';
@@ -144,8 +142,7 @@ class DbFunctions {
   ) {
     assertDateTimesValues(values);
     DateTimeField result = DateTimeField();
-    result.queryBuilder =
-        () => '$functionName(' + _buildListQuery(values) + ')';
+    result.queryBuilder = () => '$functionName(${_buildListQuery(values)})';
     result.parametersBuilder = () => _buildParametersList(values);
     return result;
   }

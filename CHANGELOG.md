@@ -47,3 +47,12 @@
 
 ## [0.0.5+3]
 * Removed ColorField
+
+## [0.0.5+4]
+* Removed Flutter as dependency
+
+## [0.0.5+5]
+* Added support to Color type
+
+## [0.0.5+6]
+* Remove same types assertion when copy values from db model to another

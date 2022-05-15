@@ -25,13 +25,7 @@ class OperatorQuery<T> extends QueryPart {
     if (queryBuilder != null) return queryBuilder!();
     return operatorText == null
         ? ''
-        : "(" +
-            _buildQueryForOperand(before) +
-            ' ' +
-            operatorText! +
-            ' ' +
-            _buildQueryForOperand(after) +
-            ")";
+        : '(${_buildQueryForOperand(before)} ${operatorText!} ${_buildQueryForOperand(after)})';
   }
 
   String _buildQueryForOperand(dynamic v) =>

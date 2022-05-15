@@ -54,7 +54,7 @@ abstract class DbModel {
   /// [fullCopy] Copy values with (id, serverId, creationTime, modificationTime).
   void copyValuesFrom(DbModel other,
       {List<FieldWithValue>? fieldsToCopy, bool fullCopy = false}) {
-    assert(runtimeType == other.runtimeType);
+    // assert(runtimeType == other.runtimeType);
 
     FieldWithValue? Function(String name) getCorrepondingField;
     getCorrepondingField = (String name) {
@@ -111,7 +111,7 @@ abstract class DbModel {
   Iterable<FieldWithValue> differIn(DbModel other,
       {List<FieldWithValue>? fieldsToCheck, bool? allFields = true}) sync* {
     assert(allFields != null);
-    assert(runtimeType == other.runtimeType);
+    // assert(runtimeType == other.runtimeType);
 
     Map<String?, FieldWithValue> fieldsMap = {};
     for (var e
