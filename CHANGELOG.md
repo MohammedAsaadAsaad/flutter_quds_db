@@ -56,3 +56,6 @@
 
 ## [0.0.5+6]
 * Remove same types assertion when copy values from db model to another
+
+## [0.0.5+6]
+* Fixed DateTime Storage

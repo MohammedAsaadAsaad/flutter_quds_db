@@ -124,7 +124,7 @@ class DbHelper {
             ? value
             : value == null
                 ? null
-                : DateTime.tryParse(value.toString());
+                : DateTime.tryParse(value.toString())?.toLocal();
       case bool:
         return value is bool
             ? value
