@@ -158,6 +158,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   FieldOrder get ascOrder {
     var result = FieldOrder();
     result.queryBuilder = () => '${buildQuery()} ASC';
+    result.parametersBuilder = () => [...getParameters()];
     return result;
   }
 
@@ -171,6 +172,7 @@ class FieldWithValue<T> extends QueryPart<T> {
   FieldOrder get descOrder {
     var result = FieldOrder();
     result.queryBuilder = () => '${buildQuery()} DESC';
+    result.parametersBuilder = () => [...getParameters()];
     return result;
   }
 

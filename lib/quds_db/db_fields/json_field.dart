@@ -90,4 +90,6 @@ class JsonField extends _JsonField<Map> {
     result.parametersBuilder = () => [...getParameters(), key, value];
     return result;
   }
+
+  StringField asStringFieldForQuery() => StringField(columnName: columnName);
 }

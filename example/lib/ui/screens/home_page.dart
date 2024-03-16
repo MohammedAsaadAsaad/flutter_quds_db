@@ -37,7 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadData() async {
-    notes.addAll(await notesProvider.select());
+    notes.addAll(await notesProvider.select(
+      orderBy: (e) => [(e.id - 500).descOrder],
+    ));
 
     if (mounted) setState(() {});
   }
@@ -110,12 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ..title.value = 'New note'
           ..content.value = 'Note content, describe your self'
           ..importance.value = (Importance.values.toList()..shuffle()).first
-      ..color.value = ([
-        const Color(0xffff0000),
-        const Color(0xff00ff00),
-        const Color(0xff0000ff)
-      ]..shuffle())
-          .first
+          ..color.value = ([
+            const Color(0xffff0000),
+            const Color(0xff00ff00),
+            const Color(0xff0000ff)
+          ]..shuffle())
+              .first
     ];
 
     await notesProvider.insertCollection(notes);

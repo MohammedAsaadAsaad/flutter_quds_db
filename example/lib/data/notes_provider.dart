@@ -8,4 +8,10 @@ class NotesProvider extends DbTableProvider<Note> {
 
   @override
   String get tableName => 'Notes';
+
+  @override
+  List<List<FieldWithValue>>? getIndices(Note e) => [
+        [e.id, e.title],
+        [e.title]
+      ];
 }

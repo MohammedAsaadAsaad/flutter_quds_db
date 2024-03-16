@@ -57,5 +57,22 @@
 ## [0.0.5+6]
 * Remove same types assertion when copy values from db model to another
 
-## [0.0.5+6]
+## [0.0.5+7]
 * Fixed DateTime Storage
+
+## [0.0.6+1]
+* Support creating indices
+
+## [0.0.6+2]
+* Added `asStringFieldForQuery` method for JsonField
+
+
+## [0.0.6+3]
+* Updated dependencies
+
+## [0.0.6+4]
+* Added support to the order statement arguments
+* Added new function "ABS"
+
+## [0.0.6+5]
+* Added new callback to the DbModel which be invoked when the model is fully loaded

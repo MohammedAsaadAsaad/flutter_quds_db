@@ -179,4 +179,12 @@ void _addMathSupportFunctions(Database db) {
         var arg = s[0] as num;
         return math.sqrt(arg);
       });
+
+  db.createFunction(
+      functionName: 'abs',
+      argumentCount: const AllowedArgumentCount(1),
+      function: (s) {
+        var arg = s[0] as num;
+        return arg.abs();
+      });
 }

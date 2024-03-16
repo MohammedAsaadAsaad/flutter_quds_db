@@ -38,6 +38,8 @@ abstract class DbModel {
   /// Called automatically after this model be saved in db.
   afterSave(bool isNew) async {}
 
+  afterLoad() async {}
+
   /// Get a list of the new defined fields of this model without pre-created fields.
   List<FieldWithValue>? getFields();
 

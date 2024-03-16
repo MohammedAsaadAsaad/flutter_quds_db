@@ -88,13 +88,13 @@ class IntField extends NumField<int> {
   /// Get sql statement to check weather this field is odd.
   ConditionQuery get isOdd => (this % 2).equals(1);
 
-  /// Get new [IntField] object with db `ABS()` function applied.
-  IntField abs() {
-    var result = IntField();
-    result.queryBuilder = () => 'ABS(${buildQuery()})';
-    result.parametersBuilder = () => getParameters();
-    return result;
-  }
+  // /// Get new [IntField] object with db `ABS()` function applied.
+  // IntField abs() {
+  //   var result = IntField();
+  //   result.queryBuilder = () => 'ABS(${buildQuery()})';
+  //   result.parametersBuilder = () => getParameters();
+  //   return result;
+  // }
 
   /// Get new [IntField] object with db `AVG()` function applied.
   IntField avg() {

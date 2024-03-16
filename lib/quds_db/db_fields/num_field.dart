@@ -286,4 +286,12 @@ class NumField<T> extends FieldWithValue<T> {
     result.parametersBuilder = () => getParameters();
     return result;
   }
+
+  /// Get db value with `ABS(X)` function applied.
+  DoubleField abs() {
+    DoubleField result = DoubleField();
+    result.queryBuilder = () => 'ABS(${buildQuery()})';
+    result.parametersBuilder = () => getParameters();
+    return result;
+  }
 }

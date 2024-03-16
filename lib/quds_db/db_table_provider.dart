@@ -309,6 +309,7 @@ abstract class DbTableProvider<T extends DbModel> {
           orElse: () => null);
       if (f != null) f.dbValue = e.value;
     }
+    e.afterLoad();
     return e;
   }
 
@@ -718,5 +719,39 @@ abstract class DbTableProvider<T extends DbModel> {
     for (var listner in _entryListners) {
       listner.call(type, entry);
     }
+  }
+
+  List<List<FieldWithValue>>? getIndices(T e) {
+    return null;
+  }
+
+  List<String>? _generateIndicesBuilderQuery() {
+    var indices = getIndices(_createInstance());
+    if (indices == null || indices.isEmpty) return null;
+
+    List<String> result = [];
+
+    for (var i in indices) {
+      if (i.isEmpty) continue;
+
+      String indexName = '';
+      String columnNames = '';
+      for (var c in i) {
+        indexName += c.columnName ?? '';
+        indexName += '_';
+        columnNames += c.columnName ?? '';
+        columnNames += ',';
+      }
+      indexName = '${tableName}_${indexName}idx';
+
+      columnNames = columnNames.substring(0, columnNames.length - 1);
+
+      String q =
+          'CREATE INDEX IF NOT EXISTS $indexName ON $tableName ($columnNames)';
+
+      result.add(q);
+    }
+
+    return result;
   }
 }

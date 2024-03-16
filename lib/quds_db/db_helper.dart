@@ -83,6 +83,7 @@ class DbHelper {
     // initializeSupportFunctions(database);
 
     await _createTablesInDB(dbProvider, database);
+    await _createTableIndices(dbProvider, database);
     map[mapKey] = database;
     return database;
   }
@@ -93,6 +94,22 @@ class DbHelper {
     try {
       await provider._checkAndCreateTableIfNotExist(db);
       await provider._checkEachColumn(db);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Create table indices.
+  static Future<bool> _createTableIndices(
+      DbTableProvider provider, dynamic db) async {
+    try {
+      var indices = provider._generateIndicesBuilderQuery();
+      if (indices != null && indices.isNotEmpty) {
+        for (var i in indices) {
+          db.execute(i);
+        }
+      }
       return true;
     } catch (e) {
       return false;
@@ -169,6 +186,9 @@ class DbHelper {
   /// Get dart native value of some db value.
   static getValueFromDbValue(Type type, dynamic dbValue) {
     if (type == bool) return dbValue == null ? null : dbValue == 1;
+
+    if (type == double && dbValue is int) return dbValue.toDouble();
+    if (type == double && dbValue is String) return double.tryParse(dbValue);
 
     if (type == DateTime) {
       return dbValue == null
