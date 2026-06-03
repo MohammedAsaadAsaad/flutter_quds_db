@@ -76,3 +76,6 @@
 
 ## [0.0.6+5]
 * Added new callback to the DbModel which be invoked when the model is fully loaded
+
+## [0.0.6+6]
+* Added new callback to the DbModel which be invoked when the model is fully loaded

@@ -57,11 +57,12 @@ class DbHelper {
 
     if (!_donationDisplayed) {
       _donationDisplayed = true;
-      log('_______________Quds Db________________');
-      log('Hi great developer!');
-      log('Would you donate to Quds Db developers team?\nIt will be great help to our team to continue the developement!');
-      log('_____________Donation Link____________');
-      log('https://www.paypal.com/donate?hosted_button_id=94Y2Q9LQR9XHS');
+      log('Quds Db has been initialized!');
+      // log('_______________Quds Db________________');
+      // log('Hi great developer!');
+      // log('Would you donate to Quds Db developers team?\nIt will be great help to our team to continue the developement!');
+      // log('_____________Donation Link____________');
+      // log('https://www.paypal.com/donate?hosted_button_id=94Y2Q9LQR9XHS');
     }
   }
 
@@ -115,6 +116,9 @@ class DbHelper {
       return false;
     }
   }
+
+  static dynamic getMapValue(dynamic value, Type returnType) =>
+      _getMapValue(value, returnType);
 
   static dynamic _getMapValue(dynamic value, Type returnType) {
     switch (returnType) {
